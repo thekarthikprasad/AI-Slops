@@ -31,7 +31,7 @@ export function AppShell() {
             </main>
 
             <nav className="fixed bottom-0 left-0 right-0 pb-safe pt-3 z-50 bg-white/80 dark:bg-[#1C1C1E]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10">
-                <div className="max-w-md mx-auto grid grid-cols-5 items-end px-2 h-16 pb-2">
+                <div className="max-w-md mx-auto grid grid-cols-5 items-center px-2 h-16 pb-2">
                     {tabs.map((tab) => {
                         const isActive = location.pathname === tab.path;
                         const Icon = tab.icon;

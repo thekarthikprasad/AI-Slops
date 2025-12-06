@@ -56,9 +56,6 @@ export function AddExpense() {
         <div className="h-screen flex flex-col animate-fade-in pb-24">
             <Header
                 title="Add Expense"
-                rightAction={
-                    <button onClick={() => navigate("/")} className="text-ios-blue ">Cancel</button>
-                }
             />
 
             <div className="flex-1 flex flex-col p-4 gap-6">
@@ -138,7 +135,7 @@ export function AddExpense() {
                 </button>
                 <button
                     onClick={() => navigate("/")}
-                    className="w-full bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white py-4 rounded-2xl shadow-lg font-bold text-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white py-4 rounded-2xl shadow-lg font-bold text-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
                 >
                     Cancel
                 </button>
