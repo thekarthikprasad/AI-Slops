@@ -53,67 +53,75 @@ export function AddExpense() {
     };
 
     return (
-        <div className="h-screen flex flex-col animate-fade-in pb-24">
+        <div className="h-screen flex flex-col animate-fade-in">
             <Header
                 title="Add Expense"
             />
 
-            <div className="flex-1 flex flex-col p-4 gap-6">
+            <div className="flex-1 overflow-y-auto p-4 pb-32 space-y-4 no-scrollbar">
                 {/* Amount Display */}
-                <div className="flex flex-col items-center justify-center py-8">
-                    <span className="text-gray-500 dark:text-ios-subtext ">Amount</span>
-                    <div className="text-5xl font-bold flex items-center text-gray-400 dark:text-ios-gray3">
-                        <span className="mr-1">₹</span>
+                <div className="flex flex-col items-center justify-center py-4">
+                    <span className="text-sm text-gray-500 dark:text-ios-subtext font-medium">Amount</span>
+                    <div className="text-5xl font-bold flex items-center text-gray-800 dark:text-white mt-1">
+                        <span className="mr-1 text-3xl text-gray-400">₹</span>
                         {amount}
                     </div>
                 </div>
 
                 {/* Category Selector */}
                 <div className="space-y-2">
-                    <span className="text-sm text-gray-500 dark:text-ios-subtext ">Category</span>
-                    <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+                    <span className="text-xs font-medium text-gray-500 dark:text-ios-subtext ml-1">Category</span>
+                    <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
                         {sortedCategories.map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setCategory(cat)}
                                 className={cn(
-                                    "flex flex-col items-center gap-2 min-w-[80px] max-w-[90px] h-auto px-2 py-3 rounded-xl transition-all",
+                                    "flex flex-col items-center gap-2 min-w-[72px] p-2 rounded-2xl transition-all",
                                     category === cat
-                                        ? "card-gradient shadow-ios scale-105"
-                                        : "bg-gray-100 dark:bg-ios-gray6 border border-gray-200 dark:border-ios-gray5"
+                                        ? "bg-white dark:bg-white/10 shadow-ios scale-105 border border-purple-100 dark:border-white/10"
+                                        : "bg-white/50 dark:bg-black/20 border border-transparent hover:bg-white/80 dark:hover:bg-white/5"
                                 )}
                             >
-                                <CategoryIcon category={cat} />
-                                <span className="text-[10px] font-medium text-black dark:text-white text-center leading-tight">{cat}</span>
+                                <div className={cn(
+                                    "p-2 rounded-full",
+                                    category === cat ? "bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-300" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                                )}>
+                                    <CategoryIcon category={cat} className="w-5 h-5" />
+                                </div>
+                                <span className={cn(
+                                    "text-[10px] font-medium leading-tight",
+                                    category === cat ? "text-purple-700 dark:text-purple-300" : "text-gray-600 dark:text-gray-400"
+                                )}>{cat}</span>
                             </button>
                         ))}
                     </div>
                 </div>
 
                 {/* Date Picker */}
-                <div className="card-gradient rounded-xl p-3 flex items-center justify-between shadow-ios">
+                <div className="bg-white/60 dark:bg-black/40 backdrop-blur-md rounded-2xl p-3 flex items-center justify-between shadow-sm border border-white/20 dark:border-white/10">
                     <div className="flex items-center gap-3">
-                        <div className="bg-ios-blue/10 p-2 rounded-lg text-ios-blue">
-                            <Calendar size={20} />
+                        <div className="bg-purple-100 dark:bg-purple-500/20 p-2 rounded-xl text-purple-600 dark:text-purple-400">
+                            <Calendar size={18} />
                         </div>
-                        <span className="font-medium text-gray-900 dark:text-white ">Date</span>
+                        <span className="font-medium text-sm text-gray-700 dark:text-gray-200">Date</span>
                     </div>
                     <input
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="bg-transparent text-right font-medium text-ios-blue "
+                        className="bg-transparent text-right font-medium text-purple-600 dark:text-purple-400 text-sm focus:outline-none"
                     />
                 </div>
 
                 {/* Keypad */}
-                <div className="mt-auto grid grid-cols-3 gap-4 pb-safe">
+                <div className="grid grid-cols-3 gap-3 pt-2">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, ".", 0].map((num) => (
                         <motion.button
                             key={num}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleNumPress(num.toString())}
-                            className="h-16 text-2xl font-medium rounded-full card-gradient shadow-sm flex items-center justify-center text-gray-900 dark:text-white "
+                            className="h-14 text-xl font-medium rounded-2xl bg-white/60 dark:bg-black/40 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/10 flex items-center justify-center text-gray-800 dark:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-colors"
                         >
                             {num}
                         </motion.button>
@@ -121,24 +129,27 @@ export function AddExpense() {
                     <motion.button
                         whileTap={{ scale: 0.9 }}
                         onClick={handleDelete}
-                        className="h-16 flex items-center justify-center rounded-full bg-red-500 dark:bg-red-600 text-white text-xl shadow-sm"
+                        className="h-14 flex items-center justify-center rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 text-xl shadow-sm border border-red-100 dark:border-red-500/30"
                     >
                         ⌫
                     </motion.button>
                 </div>
 
-                <button
-                    onClick={handleSave}
-                    className="w-full bg-premium-gradient text-white py-4 rounded-2xl shadow-lg font-bold text-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
-                >
-                    Save Expense
-                </button>
-                <button
-                    onClick={() => navigate("/")}
-                    className="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white py-4 rounded-2xl shadow-lg font-bold text-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
-                >
-                    Cancel
-                </button>
+                {/* Actions */}
+                <div className="space-y-3 pt-2">
+                    <button
+                        onClick={handleSave}
+                        className="w-full bg-premium-gradient text-white py-3.5 rounded-2xl shadow-lg shadow-purple-500/20 font-semibold text-base active:scale-95 transition-transform flex items-center justify-center gap-2"
+                    >
+                        Save Expense
+                    </button>
+                    <button
+                        onClick={() => navigate("/")}
+                        className="w-full bg-white/50 dark:bg-white/5 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 py-3.5 rounded-2xl font-semibold text-base active:scale-95 transition-transform flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-white/10"
+                    >
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
     );
