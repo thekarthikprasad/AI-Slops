@@ -82,6 +82,7 @@
     --color-ios-gray5: #E5E5EA;
 
     --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    color-scheme: light;
   }
 
   body {
@@ -109,9 +110,14 @@
     background-attachment: fixed;
   }
 
+  input[type="date"] {
+    accent-color: #AF52DE;
+    /* iOS Purple */
+  }
+
   .dark body {
-    /* Deep, cool gradient for dark mode - following Material Design 3 */
-    background: linear-gradient(-45deg, #0a0a0a, #1a1a2e, #16213e, #0f3460);
+    /* Deeper, darker gradient for dark mode */
+    background: linear-gradient(-45deg, #000000, #0a0a0a, #111111, #050505);
     background-size: 400% 400%;
     animation: mesh 20s ease infinite;
     background-attachment: fixed;
@@ -124,6 +130,13 @@
     --color-ios-gray6: #1C1C1E;
     --color-ios-gray3: #48484A;
     --color-ios-gray5: #2C2C2E;
+    color-scheme: dark;
+  }
+
+  .dark input[type="date"] {
+    color-scheme: dark;
+    accent-color: #AF52DE;
+    /* iOS Purple */
   }
 
 }
@@ -137,14 +150,22 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-lg border border-white/20 dark:bg-black/70 dark:border-white/10;
+    @apply bg-white/60 backdrop-blur-xl border border-white/20 dark:bg-black/60 dark:border-white/10;
   }
 
   .animate-mesh {
-    /* Vibrant Apple Music style mesh gradient */
-    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1, #fbc2eb);
+    /* Adaptive Mesh Gradient - Pleasing & Visible */
+    /* Light Mode: Soft, airy blend (Lavender, Pale Blue, Soft Pink) */
+    background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #ffdee9, #b5fffc);
     background-size: 400% 400%;
-    animation: mesh 20s ease infinite;
+    animation: mesh 40s ease infinite;
+  }
+
+  .dark .animate-mesh {
+    /* Dark Mode: Deep, rich, calming blend (Deep Blue, Purple, Night Sky) */
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #24243e, #302b63, #0f0c29);
+    background-size: 400% 400%;
+    animation: mesh 40s ease infinite;
   }
 
   .bg-gradient-primary {
@@ -160,7 +181,8 @@
   }
 
   .card-gradient {
-    @apply bg-white dark:bg-gradient-to-br dark:from-gray-800/90 dark:via-gray-900/90 dark:to-black/90 text-gray-900 dark:text-white;
+    /* White card with black text in light mode, dark card in dark mode */
+    @apply bg-white dark:bg-[#1C1C1E] text-black dark:text-white border border-gray-100 dark:border-white/5;
   }
 
   .no-scrollbar::-webkit-scrollbar {

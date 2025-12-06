@@ -13,6 +13,7 @@ export function AddExpense() {
     const expenses = useExpenseStore((state) => state.expenses);
 
     const [amount, setAmount] = useState("0");
+    const [name, setName] = useState("");
     const [category, setCategory] = useState<Category>('Food');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
@@ -45,6 +46,7 @@ export function AddExpense() {
 
     const handleSave = () => {
         addExpense({
+            name: name || category, // Default to category if name is empty
             amount: parseFloat(amount),
             category,
             date: new Date(date).toISOString(),
@@ -53,12 +55,12 @@ export function AddExpense() {
     };
 
     return (
-        <div className="h-screen flex flex-col animate-fade-in">
+        <div className="h-[100dvh] flex flex-col animate-fade-in">
             <Header
                 title="Add Expense"
             />
 
-            <div className="flex-1 overflow-y-auto p-4 pb-32 space-y-4 no-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 pb-safe space-y-4 no-scrollbar">
                 {/* Amount Display */}
                 <div className="flex flex-col items-center justify-center py-4">
                     <span className="text-sm text-gray-500 dark:text-ios-subtext font-medium">Amount</span>
@@ -66,6 +68,18 @@ export function AddExpense() {
                         <span className="mr-1 text-3xl text-gray-400">₹</span>
                         {amount}
                     </div>
+                </div>
+
+                {/* Name Input */}
+                <div className="glass rounded-2xl p-3 flex items-center gap-3 shadow-sm">
+                    <span className="font-medium text-sm text-gray-700 dark:text-gray-200 min-w-[40px]">Name</span>
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="What is this for?"
+                        className="bg-transparent w-full font-medium text-gray-800 dark:text-white text-sm focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                    />
                 </div>
 
                 {/* Category Selector */}
@@ -99,7 +113,7 @@ export function AddExpense() {
                 </div>
 
                 {/* Date Picker */}
-                <div className="bg-white/60 dark:bg-black/40 backdrop-blur-md rounded-2xl p-3 flex items-center justify-between shadow-sm border border-white/20 dark:border-white/10">
+                <div className="glass rounded-2xl p-3 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="bg-purple-100 dark:bg-purple-500/20 p-2 rounded-xl text-purple-600 dark:text-purple-400">
                             <Calendar size={18} />
@@ -121,7 +135,7 @@ export function AddExpense() {
                             key={num}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleNumPress(num.toString())}
-                            className="h-14 text-xl font-medium rounded-2xl bg-white/60 dark:bg-black/40 backdrop-blur-md shadow-sm border border-white/20 dark:border-white/10 flex items-center justify-center text-gray-800 dark:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-colors"
+                            className="h-14 text-xl font-medium rounded-2xl glass shadow-sm flex items-center justify-center text-gray-800 dark:text-white hover:bg-white/80 dark:hover:bg-white/10 transition-colors"
                         >
                             {num}
                         </motion.button>
@@ -136,7 +150,7 @@ export function AddExpense() {
                 </div>
 
                 {/* Actions */}
-                <div className="space-y-3 pt-2">
+                <div className="space-y-3 pt-4 pb-8">
                     <button
                         onClick={handleSave}
                         className="w-full bg-premium-gradient text-white py-3.5 rounded-2xl shadow-lg shadow-purple-500/20 font-semibold text-base active:scale-95 transition-transform flex items-center justify-center gap-2"

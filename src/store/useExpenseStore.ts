@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -6,6 +5,7 @@ export type Category = 'Food' | 'Transport' | 'Shopping' | 'Entertainment' | 'Bi
 
 export interface Expense {
     id: string;
+    name: string;
     amount: number;
     category: Category;
     date: string; // ISO string
@@ -21,6 +21,8 @@ export interface Budget {
 
 interface ExpenseStore {
     expenses: Expense[];
+    setExpenses: (expenses: Expense[]) => void;
+    clearExpenses: () => void;
     addExpense: (expense: Omit<Expense, 'id'>) => void;
     deleteExpense: (id: string) => void;
     getExpensesByDate: (date: Date) => Expense[];
@@ -34,6 +36,8 @@ interface ExpenseStore {
     getBudgetProgress: (category: Category) => { spent: number; limit: number; percentage: number };
     theme: 'light' | 'dark' | 'system';
     setTheme: (theme: 'light' | 'dark' | 'system') => void;
+    notifications: boolean;
+    toggleNotifications: () => void;
 }
 
 export const useExpenseStore = create<ExpenseStore>()(
@@ -42,6 +46,7 @@ export const useExpenseStore = create<ExpenseStore>()(
             expenses: [],
             budgets: [],
             theme: 'system',
+            notifications: false,
             setTheme: (theme) => {
                 set({ theme });
                 const root = window.document.documentElement;
@@ -54,6 +59,9 @@ export const useExpenseStore = create<ExpenseStore>()(
                     root.classList.add(theme);
                 }
             },
+            toggleNotifications: () => set((state) => ({ notifications: !state.notifications })),
+            setExpenses: (expenses) => set({ expenses }),
+            clearExpenses: () => set({ expenses: [] }),
             addExpense: (expense) => set((state) => ({
                 expenses: [
                     { ...expense, id: Math.random().toString(36).substr(2, 9) },

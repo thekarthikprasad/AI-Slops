@@ -9,11 +9,11 @@ export function generateCommentary(expenses: Expense[], balance: number): string
     const topCategory = getTopCategory(expenses);
 
     if (balance < 1000) {
-        return `Careful! Your balance is getting low ($${balance.toFixed(0)}). You've spent a lot on ${topCategory} recently.`;
+        return `Careful! Your balance is getting low (₹${balance.toFixed(0)}). You've spent a lot on ${topCategory} recently.`;
     }
 
     if (totalSpent > 2000) {
-        return `Whoa, big spender! You've spent $${totalSpent.toFixed(0)} this month. Maybe cut back on ${topCategory}?`;
+        return `Whoa, big spender! You've spent ₹${totalSpent.toFixed(0)} this month. Maybe cut back on ${topCategory}?`;
     }
 
     return `You're doing great! Your spending on ${topCategory} is within reasonable limits. Keep saving!`;
