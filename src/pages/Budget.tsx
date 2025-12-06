@@ -17,10 +17,17 @@ export default function Budget() {
 
     const handleCreateBudget = () => {
         if (newBudgetName && newBudgetAmount) {
-            createBudget(newBudgetName, newBudgetCategory, parseInt(newBudgetAmount));
+            const amount = parseFloat(newBudgetAmount);
+            if (isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid amount");
+                return;
+            }
+            createBudget(newBudgetName, newBudgetCategory, amount);
             setNewBudgetName("");
             setNewBudgetAmount("");
             setShowCreateForm(false);
+        } else {
+            alert("Please fill in all fields");
         }
     };
 

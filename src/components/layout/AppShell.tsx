@@ -23,30 +23,32 @@ export function AppShell() {
     return (
         <div className="min-h-screen pb-24 relative overflow-hidden">
             {/* Global Mesh Gradient Background */}
-            <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20 pointer-events-none animate-mesh" />
+            <div className="fixed inset-0 z-0 opacity-60 dark:opacity-40 pointer-events-none animate-mesh" />
 
             <main className="max-w-md mx-auto min-h-screen relative z-10">
                 <Outlet />
             </main>
 
             <nav className="fixed bottom-0 left-0 right-0 pb-safe pt-3 z-50 bg-white/80 dark:bg-[#1C1C1E]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10">
-                <div className="max-w-md mx-auto flex justify-around items-center px-2">
+                <div className="max-w-md mx-auto flex justify-between items-center px-6 relative h-16">
                     {tabs.map((tab) => {
                         const isActive = location.pathname === tab.path;
                         const Icon = tab.icon;
 
                         if (tab.special) {
                             return (
-                                <Link key={tab.name} to={tab.path}>
-                                    <motion.div
-                                        whileTap={{ scale: 0.85 }}
-                                        whileHover={{ scale: 1.05 }}
-                                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                                        className="bg-premium-gradient p-3.5 rounded-2xl shadow-lg"
-                                    >
-                                        <Icon size={26} className="text-white" />
-                                    </motion.div>
-                                </Link>
+                                <div key={tab.name} className="absolute left-1/2 -translate-x-1/2 -top-6">
+                                    <Link to={tab.path}>
+                                        <motion.div
+                                            whileTap={{ scale: 0.85 }}
+                                            whileHover={{ scale: 1.05 }}
+                                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                                            className="bg-premium-gradient p-4 rounded-full shadow-lg border-4 border-white dark:border-[#1C1C1E]"
+                                        >
+                                            <Icon size={28} className="text-white" />
+                                        </motion.div>
+                                    </Link>
+                                </div>
                             );
                         }
 
@@ -61,8 +63,8 @@ export function AppShell() {
                                     className={cn(
                                         "flex flex-col items-center gap-1 p-2 w-16 rounded-2xl transition-all duration-200",
                                         isActive
-                                            ? "text-purple-600 dark:text-violet-400 bg-purple-100/50 dark:bg-purple-900/20"
-                                            : "text-gray-700 dark:text-ios-gray hover:bg-gray-200/60 dark:hover:bg-white/5"
+                                            ? "text-purple-600 dark:text-violet-400"
+                                            : "text-gray-400 dark:text-gray-500"
                                     )}
                                 >
                                     <motion.div

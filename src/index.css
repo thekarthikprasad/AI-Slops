@@ -142,7 +142,7 @@
 
   .animate-mesh {
     /* Glassish grey gradient - subtle and premium */
-    background: linear-gradient(-45deg, #f8f9fa, #e9ecef, #dee2e6, #f1f3f5);
+    background: linear-gradient(-45deg, #eef2f3, #d9e4f5, #f5e3e6, #d9e4f5);
     background-size: 400% 400%;
     animation: mesh 20s ease infinite;
   }
