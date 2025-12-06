@@ -40,11 +40,7 @@ export const useExpenseStore = create<ExpenseStore>()(
     persist(
         (set, get) => ({
             expenses: [],
-            budgets: [
-                { id: '1', name: 'Monthly Food Budget', category: 'Food', amount: 500 },
-                { id: '2', name: 'Transport Budget', category: 'Transport', amount: 200 },
-                { id: '3', name: 'Shopping Allowance', category: 'Shopping', amount: 300 },
-            ],
+            budgets: [],
             theme: 'system',
             setTheme: (theme) => {
                 set({ theme });

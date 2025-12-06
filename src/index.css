@@ -141,8 +141,8 @@
   }
 
   .animate-mesh {
-    /* Glassish grey gradient - subtle and premium */
-    background: linear-gradient(-45deg, #eef2f3, #d9e4f5, #f5e3e6, #d9e4f5);
+    /* Vibrant Apple Music style mesh gradient */
+    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1, #fbc2eb);
     background-size: 400% 400%;
     animation: mesh 20s ease infinite;
   }

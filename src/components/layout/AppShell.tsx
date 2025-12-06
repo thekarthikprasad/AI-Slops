@@ -30,14 +30,14 @@ export function AppShell() {
             </main>
 
             <nav className="fixed bottom-0 left-0 right-0 pb-safe pt-3 z-50 bg-white/80 dark:bg-[#1C1C1E]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10">
-                <div className="max-w-md mx-auto flex justify-between items-center px-6 relative h-16">
-                    {tabs.map((tab) => {
+                <div className="max-w-md mx-auto grid grid-cols-5 items-end px-2 h-16 pb-2">
+                    {tabs.map((tab, index) => {
                         const isActive = location.pathname === tab.path;
                         const Icon = tab.icon;
 
                         if (tab.special) {
                             return (
-                                <div key={tab.name} className="absolute left-1/2 -translate-x-1/2 -top-6">
+                                <div key={tab.name} className="flex justify-center relative -top-6">
                                     <Link to={tab.path}>
                                         <motion.div
                                             whileTap={{ scale: 0.85 }}
@@ -56,6 +56,7 @@ export function AppShell() {
                             <Link
                                 key={tab.name}
                                 to={tab.path}
+                                className="flex justify-center"
                             >
                                 <motion.div
                                     whileTap={{ scale: 0.85, y: -2 }}
