@@ -11,11 +11,20 @@ export function AddExpense() {
     const navigate = useNavigate();
     const addExpense = useExpenseStore((state) => state.addExpense);
     const expenses = useExpenseStore((state) => state.expenses);
+    const getCurrencySymbol = useExpenseStore((state) => state.getCurrencySymbol);
+    const currencySymbol = getCurrencySymbol();
 
     const [amount, setAmount] = useState("0");
     const [name, setName] = useState("");
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const [category, setCategory] = useState<Category>('Food');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+    // Smart Suggestions Logic
+    const uniqueNames = Array.from(new Set(expenses.map(e => e.name).filter(n => n && n.trim().length > 0)));
+    const suggestions = name.trim().length > 0
+        ? uniqueNames.filter(n => n.toLowerCase().includes(name.toLowerCase()) && n.toLowerCase() !== name.toLowerCase()).slice(0, 3)
+        : [];
 
     // Sort categories by usage frequency
     const allCategories: Category[] = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Investment', 'Misc'];
@@ -45,8 +54,12 @@ export function AddExpense() {
     };
 
     const handleSave = () => {
+        const normalizedName = name
+            ? name.trim().toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+            : category;
+
         addExpense({
-            name: name || category, // Default to category if name is empty
+            name: normalizedName,
             amount: parseFloat(amount),
             category,
             date: new Date(date).toISOString(),
@@ -65,21 +78,46 @@ export function AddExpense() {
                 <div className="flex flex-col items-center justify-center py-4">
                     <span className="text-sm text-gray-500 dark:text-ios-subtext font-medium">Amount</span>
                     <div className="text-5xl font-bold flex items-center text-gray-800 dark:text-white mt-1">
-                        <span className="mr-1 text-3xl text-gray-400">₹</span>
+                        <span className="mr-1 text-3xl text-gray-400">{currencySymbol}</span>
                         {amount}
                     </div>
                 </div>
 
                 {/* Name Input */}
-                <div className="glass rounded-2xl p-3 flex items-center gap-3 shadow-sm">
-                    <span className="font-medium text-sm text-gray-700 dark:text-gray-200 min-w-[40px]">Name</span>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="What is this for?"
-                        className="bg-transparent w-full font-medium text-gray-800 dark:text-white text-sm focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600"
-                    />
+                <div className="relative z-20">
+                    <div className="glass rounded-2xl p-3 flex items-center gap-3 shadow-sm">
+                        <span className="font-medium text-sm text-gray-700 dark:text-gray-200 min-w-[40px]">Name</span>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => {
+                                setName(e.target.value);
+                                setShowSuggestions(true);
+                            }}
+                            onFocus={() => setShowSuggestions(true)}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} // Delay to allow click
+                            placeholder="What is this for?"
+                            className="bg-transparent w-full font-medium text-gray-800 dark:text-white text-sm focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                        />
+                    </div>
+                    {/* Suggestions Dropdown */}
+                    {showSuggestions && suggestions.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-white/10 overflow-hidden animate-fade-in-up">
+                            {suggestions.map((suggestion) => (
+                                <button
+                                    key={suggestion}
+                                    onClick={() => {
+                                        setName(suggestion);
+                                        setShowSuggestions(false);
+                                    }}
+                                    className="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-white/5 transition-colors border-b last:border-0 border-gray-100 dark:border-white/5 flex items-center gap-2"
+                                >
+                                    <span className="opacity-50">↺</span>
+                                    {suggestion}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Category Selector */}
