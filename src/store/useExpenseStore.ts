@@ -11,6 +11,8 @@ export interface Expense {
     category: Category;
     date: string; // ISO string
     note?: string;
+    type?: 'expense' | 'savings' | 'investment';
+    isFromSavings?: boolean;
 }
 
 export interface Budget {
@@ -18,6 +20,21 @@ export interface Budget {
     name: string;
     category: Category;
     amount: number;
+}
+
+export interface MonthlyReport {
+    id?: string;
+    month: string;
+    year?: number;
+    income?: number;
+    budgetLimit?: number;
+    actualSpent?: number;
+    savedFromBudget?: number;
+    plannedSavings?: number;
+    plannedInvestment?: number;
+    totalSpent: number;
+    totalSaved: number;
+    totalInvested: number;
 }
 
 interface ExpenseStore {
@@ -42,6 +59,23 @@ interface ExpenseStore {
     currency: Currency;
     setCurrency: (currency: Currency) => void;
     getCurrencySymbol: () => string;
+    // Financial allocation fields
+    income: number;
+    setIncome: (income: number) => void;
+    monthlyBudget: number;
+    setMonthlyBudget: (budget: number) => void;
+    investmentGoal: number;
+    setInvestmentGoal: (goal: number) => void;
+    savingsGoal: number;
+    setSavingsGoal: (goal: number) => void;
+    totalSavings: number;
+    setTotalSavings: (savings: number) => void;
+    addToSavings: (amount: number) => void;
+    monthlyReports: MonthlyReport[];
+    addMonthlyReport: (report: MonthlyReport) => void;
+    categories: Category[];
+    lastReviewDate: string | null;
+    setLastReviewDate: (date: string) => void;
 }
 
 export const useExpenseStore = create<ExpenseStore>()(
@@ -52,6 +86,25 @@ export const useExpenseStore = create<ExpenseStore>()(
             theme: 'system',
             notifications: false,
             currency: 'INR',
+            // Financial allocation defaults
+            income: 0,
+            monthlyBudget: 0,
+            investmentGoal: 0,
+            savingsGoal: 0,
+            totalSavings: 0,
+            monthlyReports: [],
+            lastReviewDate: null,
+            categories: ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Investment', 'Misc'],
+
+            setIncome: (income) => set({ income }),
+            setMonthlyBudget: (monthlyBudget) => set({ monthlyBudget }),
+            setInvestmentGoal: (investmentGoal) => set({ investmentGoal }),
+            setSavingsGoal: (savingsGoal) => set({ savingsGoal }),
+            setTotalSavings: (totalSavings) => set({ totalSavings }),
+            addToSavings: (amount) => set((state) => ({ totalSavings: state.totalSavings + amount })),
+            addMonthlyReport: (report) => set((state) => ({ monthlyReports: [...state.monthlyReports, report] })),
+            setLastReviewDate: (lastReviewDate) => set({ lastReviewDate }),
+
             setCurrency: (currency) => set({ currency }),
             getCurrencySymbol: () => {
                 const currency = get().currency;
@@ -101,12 +154,16 @@ export const useExpenseStore = create<ExpenseStore>()(
                 budgets: state.budgets.filter(b => b.id !== id)
             })),
             getTotalBudget: () => {
-                return get().budgets.reduce((acc, b) => acc + b.amount, 0);
+                const state = get();
+                // Use monthlyBudget if set, otherwise sum of budgets
+                return state.monthlyBudget > 0 ? state.monthlyBudget : state.budgets.reduce((acc, b) => acc + b.amount, 0);
             },
             getOverallBudgetStatus: () => {
                 const state = get();
-                const totalBudget = state.budgets.reduce((acc, b) => acc + b.amount, 0);
-                const totalSpent = state.expenses.reduce((acc, e) => acc + e.amount, 0);
+                const totalBudget = state.monthlyBudget > 0 ? state.monthlyBudget : state.budgets.reduce((acc, b) => acc + b.amount, 0);
+                const totalSpent = state.expenses
+                    .filter(e => e.type === 'expense' || (!e.type && !e.isFromSavings))
+                    .reduce((acc, e) => acc + e.amount, 0);
                 const percentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
                 if (percentage >= 100) return 'over';
                 if (percentage >= 80) return 'near';

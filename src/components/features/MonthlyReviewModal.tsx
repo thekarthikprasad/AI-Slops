@@ -121,8 +121,9 @@ export const MonthlyReviewModal = () => {
                 budgetLimit: reviewData.budgetLimit,
                 actualSpent: reviewData.spent,
                 savedFromBudget: reviewData.savedFromBudget,
-                plannedSavings: useExpenseStore.getState().savingsGoal, // Explicit setting
+                plannedSavings: useExpenseStore.getState().savingsGoal,
                 plannedInvestment: reviewData.plannedInvestment,
+                totalSpent: reviewData.spent,
                 totalSaved: reviewData.savings,
                 totalInvested: reviewData.plannedInvestment
             });

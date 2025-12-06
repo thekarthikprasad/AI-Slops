@@ -3,7 +3,7 @@ import { Header } from "../components/layout/Header";
 import { useExpenseStore } from "../store/useExpenseStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { ArrowLeft, Check, Delete, ChevronDown } from "lucide-react";
+import { Check, Delete } from "lucide-react";
 import { cn, normalizeText } from "../lib/utils";
 import type { Category } from "../store/useExpenseStore";
 import { CategoryIcon } from "../components/ui/CategoryIcon";
