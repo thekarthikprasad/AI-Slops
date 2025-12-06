@@ -27,6 +27,6 @@ Its clean, rich UI and smart features make managing your finances simple, intuit
 
 <p>⚫🟣🔵🟢</p>
 
-https://github.com/thekarthikprasad/AI-Slops/actions/runs/19991223452/artifacts/4786276923
+https://github.com/thekarthikprasad/AI-Slops/actions/runs/19992158769/artifacts/4786517141
 <br><br>
 <p>Made with Antigravity.</p>
