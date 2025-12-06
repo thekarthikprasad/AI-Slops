@@ -15,6 +15,7 @@ export default function Dashboard() {
 
     const totalBudget = getTotalBudget();
     const budgetStatus = getOverallBudgetStatus();
+    const budgetPercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
     const commentary = generateCommentary(expenses, balance);
 
     const handleSync = () => {
@@ -57,8 +58,7 @@ export default function Dashboard() {
             : <TrendingUp className="text-gray-900" size={24} />;
     };
 
-    const totalSpent = expenses.reduce((acc, e) => acc + e.amount, 0);
-    const budgetPercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+
 
     return (
         <div className="animate-fade-in pb-24">
