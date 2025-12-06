@@ -1,174 +1,184 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Calendar } from "lucide-react";
 import { Header } from "../components/layout/Header";
+import { useExpenseStore } from "../store/useExpenseStore";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { ArrowLeft, Check, Delete, ChevronDown } from "lucide-react";
+import { cn, normalizeText } from "../lib/utils";
+import type { Category } from "../store/useExpenseStore";
 import { CategoryIcon } from "../components/ui/CategoryIcon";
-import { useExpenseStore, type Category } from "../store/useExpenseStore";
-import { cn } from "../lib/utils";
 
-export function AddExpense() {
+export default function AddExpense() {
     const navigate = useNavigate();
-    const addExpense = useExpenseStore((state) => state.addExpense);
-    const expenses = useExpenseStore((state) => state.expenses);
-    const getCurrencySymbol = useExpenseStore((state) => state.getCurrencySymbol);
+    const { addExpense, categories, expenses, getCurrencySymbol } = useExpenseStore();
     const currencySymbol = getCurrencySymbol();
 
-    const [amount, setAmount] = useState("0");
+    // State
+    const [amount, setAmount] = useState("");
     const [name, setName] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState<Category>("Food");
+    // New Type State: 'expense' | 'savings' | 'investment'
+    const [type, setType] = useState<'expense' | 'savings' | 'investment'>('expense');
+
+    // Suggestions logic
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [category, setCategory] = useState<Category>('Food');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const existingNames = Array.from(new Set(expenses.map(e => e.name).filter(Boolean)));
+    const suggestions = name ? existingNames.filter(n => n.toLowerCase().includes(name.toLowerCase())).slice(0, 3) : [];
 
-    // Smart Suggestions Logic
-    const uniqueNames = Array.from(new Set(expenses.map(e => e.name).filter(n => n && n.trim().length > 0)));
-    const suggestions = name.trim().length > 0
-        ? uniqueNames.filter(n => n.toLowerCase().includes(name.toLowerCase()) && n.toLowerCase() !== name.toLowerCase()).slice(0, 3)
-        : [];
-
-    // Sort categories by usage frequency
-    const allCategories: Category[] = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Investment', 'Misc'];
-    const categoryCounts = allCategories.map(cat => ({
-        category: cat,
-        count: expenses.filter(e => e.category === cat).length
-    }));
-    const sortedCategories = categoryCounts
-        .sort((a, b) => b.count - a.count)
-        .map(item => item.category);
-
+    // Numpad logic
     const handleNumPress = (num: string) => {
-        if (amount === "0" && num !== ".") {
-            setAmount(num);
-        } else {
-            if (num === "." && amount.includes(".")) return;
-            setAmount(amount + num);
-        }
+        if (amount.includes('.') && num === '.') return;
+        if (amount.length > 8) return;
+        setAmount(prev => prev + num);
     };
 
     const handleDelete = () => {
-        if (amount.length === 1) {
-            setAmount("0");
-        } else {
-            setAmount(amount.slice(0, -1));
-        }
+        setAmount(prev => prev.slice(0, -1));
     };
 
     const handleSave = () => {
-        const normalizedName = name
-            ? name.trim().toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
-            : category;
+        if (!amount) return;
+
+        let finalName = normalizeText(name);
+        let finalCategory = selectedCategory;
+
+        // Default naming if empty
+        if (!finalName) {
+            if (type === 'investment') finalName = "Investment";
+            else if (type === 'savings') finalName = "Savings Deposit";
+            else finalName = selectedCategory;
+        }
+
+        // Auto-categorize Investment
+        if (type === 'investment') {
+            finalCategory = 'Investment';
+        }
 
         addExpense({
-            name: normalizedName,
+            name: finalName,
             amount: parseFloat(amount),
-            category,
-            date: new Date(date).toISOString(),
+            category: finalCategory,
+            date: new Date().toISOString(),
+            type: type // Pass the type
         });
+
         navigate("/");
     };
 
-    return (
-        <div className="h-[100dvh] flex flex-col animate-fade-in">
-            <Header
-                title="Add Expense"
-            />
+    // Quick Selectors for Type
+    const types = [
+        { id: 'expense', label: 'Expense', color: 'bg-blue-500' },
+        { id: 'investment', label: 'Investment', color: 'bg-purple-500' },
+        { id: 'savings', label: 'Savings', color: 'bg-emerald-500' },
+    ] as const;
 
-            <div className="flex-1 overflow-y-auto p-4 pb-safe space-y-4 no-scrollbar">
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-black pb-24">
+            <Header title="Add Transaction" showBack />
+
+            <div className="px-6 pt-6">
+                {/* Type Selector (New) */}
+                <div className="flex bg-gray-200 dark:bg-white/10 p-1 rounded-2xl mb-6">
+                    {types.map((t) => (
+                        <button
+                            key={t.id}
+                            onClick={() => setType(t.id)}
+                            className={cn(
+                                "flex-1 py-3 rounded-xl text-sm font-semibold transition-all",
+                                type === t.id
+                                    ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm"
+                                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                            )}
+                        >
+                            {t.label}
+                        </button>
+                    ))}
+                </div>
+
+
                 {/* Amount Display */}
-                <div className="flex flex-col items-center justify-center py-4">
-                    <span className="text-sm text-gray-500 dark:text-ios-subtext font-medium">Amount</span>
-                    <div className="text-5xl font-bold flex items-center text-gray-800 dark:text-white mt-1">
-                        <span className="mr-1 text-3xl text-gray-400">{currencySymbol}</span>
-                        {amount}
+                <div className="text-center mb-8">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-2 uppercase tracking-wider">
+                        Amount ({type})
+                    </div>
+                    <div className="text-5xl font-bold text-gray-900 dark:text-white flex justify-center items-baseline gap-1">
+                        <span className="text-3xl text-gray-400">{currencySymbol}</span>
+                        {amount || "0"}
                     </div>
                 </div>
 
-                {/* Name Input */}
-                <div className="relative z-20">
-                    <div className="glass rounded-2xl p-3 flex items-center gap-3 shadow-sm">
-                        <span className="font-medium text-sm text-gray-700 dark:text-gray-200 min-w-[40px]">Name</span>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => {
-                                setName(e.target.value);
-                                setShowSuggestions(true);
-                            }}
-                            onFocus={() => setShowSuggestions(true)}
-                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} // Delay to allow click
-                            placeholder="What is this for?"
-                            className="bg-transparent w-full font-medium text-gray-800 dark:text-white text-sm focus:outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600"
-                        />
-                    </div>
+                {/* Name Input with Autocomplete */}
+                <div className="mb-6 relative">
+                    <label className="text-xs font-semibold text-gray-500 ml-4 mb-1 block uppercase">Name / Note</label>
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => { setName(e.target.value); setShowSuggestions(true); }}
+                        placeholder={type === 'expense' ? "What is this for?" : "Description..."}
+                        className="w-full bg-white dark:bg-[#1C1C1E] p-4 rounded-2xl text-lg font-medium shadow-sm border border-gray-100 dark:border-gray-800 focus:ring-2 focus:ring-blue-500 outline-none dark:text-white"
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    />
+
                     {/* Suggestions Dropdown */}
-                    {showSuggestions && suggestions.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-white/10 overflow-hidden animate-fade-in-up">
-                            {suggestions.map((suggestion) => (
+                    <AnimatePresence>
+                        {showSuggestions && suggestions.length > 0 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#2C2C2E] rounded-2xl shadow-xl z-20 border border-gray-100 dark:border-white/5 overflow-hidden"
+                            >
+                                {suggestions.map((suggestion, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => {
+                                            setName(suggestion);
+                                            setShowSuggestions(false);
+                                        }}
+                                        className="w-full text-left px-5 py-3 hover:bg-gray-50 dark:hover:bg-white/10 text-gray-700 dark:text-gray-200 border-b last:border-0 border-gray-100 dark:border-white/5"
+                                    >
+                                        {suggestion}
+                                    </button>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Category Grid (Only for Expense type) */}
+                {type === 'expense' && (
+                    <div className="mb-8">
+                        <label className="text-xs font-semibold text-gray-500 ml-4 mb-2 block uppercase">Category</label>
+                        <div className="grid grid-cols-4 gap-3">
+                            {categories.map((cat) => (
                                 <button
-                                    key={suggestion}
-                                    onClick={() => {
-                                        setName(suggestion);
-                                        setShowSuggestions(false);
-                                    }}
-                                    className="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-white/5 transition-colors border-b last:border-0 border-gray-100 dark:border-white/5 flex items-center gap-2"
+                                    key={cat}
+                                    onClick={() => setSelectedCategory(cat)}
+                                    className={cn(
+                                        "flex flex-col items-center justify-center gap-2 p-3 rounded-2xl transition-all border-2",
+                                        selectedCategory === cat
+                                            ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500"
+                                            : "bg-white dark:bg-[#1C1C1E] border-transparent hover:bg-gray-50 dark:hover:bg-gray-800"
+                                    )}
                                 >
-                                    <span className="opacity-50">↺</span>
-                                    {suggestion}
+                                    <div className="text-2xl">
+                                        <CategoryIcon category={cat} />
+                                    </div>
+                                    <span className={cn(
+                                        "text-[10px] font-medium truncate w-full text-center",
+                                        selectedCategory === cat ? "text-blue-600 dark:text-blue-400" : "text-gray-500"
+                                    )}>
+                                        {cat}
+                                    </span>
                                 </button>
                             ))}
                         </div>
-                    )}
-                </div>
-
-                {/* Category Selector */}
-                <div className="space-y-2">
-                    <span className="text-xs font-medium text-gray-500 dark:text-ios-subtext ml-1">Category</span>
-                    <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-                        {sortedCategories.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => setCategory(cat)}
-                                className={cn(
-                                    "flex flex-col items-center gap-2 min-w-[72px] p-2 rounded-2xl transition-all",
-                                    category === cat
-                                        ? "bg-white dark:bg-white/10 shadow-ios scale-105 border border-purple-100 dark:border-white/10"
-                                        : "bg-white/50 dark:bg-black/20 border border-transparent hover:bg-white/80 dark:hover:bg-white/5"
-                                )}
-                            >
-                                <div className={cn(
-                                    "p-2 rounded-full",
-                                    category === cat ? "bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-300" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-                                )}>
-                                    <CategoryIcon category={cat} className="w-5 h-5" />
-                                </div>
-                                <span className={cn(
-                                    "text-[10px] font-medium leading-tight",
-                                    category === cat ? "text-purple-700 dark:text-purple-300" : "text-gray-600 dark:text-gray-400"
-                                )}>{cat}</span>
-                            </button>
-                        ))}
                     </div>
-                </div>
+                )}
 
-                {/* Date Picker */}
-                <div className="glass rounded-2xl p-3 flex items-center justify-between shadow-sm">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-purple-100 dark:bg-purple-500/20 p-2 rounded-xl text-purple-600 dark:text-purple-400">
-                            <Calendar size={18} />
-                        </div>
-                        <span className="font-medium text-sm text-gray-700 dark:text-gray-200">Date</span>
-                    </div>
-                    <input
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        className="bg-transparent text-right font-medium text-purple-600 dark:text-purple-400 text-sm focus:outline-none"
-                    />
-                </div>
-
-                {/* Keypad */}
-                <div className="grid grid-cols-3 gap-3 pt-2">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, ".", 0].map((num) => (
+                {/* Numpad */}
+                <div className="grid grid-cols-3 gap-3 mb-8">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 0].map((num) => (
                         <motion.button
                             key={num}
                             whileTap={{ scale: 0.9 }}
@@ -183,7 +193,7 @@ export function AddExpense() {
                         onClick={handleDelete}
                         className="h-14 flex items-center justify-center rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 text-xl shadow-sm border border-red-100 dark:border-red-500/30"
                     >
-                        ⌫
+                        <Delete size={20} />
                     </motion.button>
                 </div>
 
@@ -193,7 +203,8 @@ export function AddExpense() {
                         onClick={handleSave}
                         className="w-full bg-premium-gradient text-white py-3.5 rounded-2xl shadow-lg shadow-purple-500/20 font-semibold text-base active:scale-95 transition-transform flex items-center justify-center gap-2"
                     >
-                        Save Expense
+                        <Check size={18} />
+                        Save {type === 'expense' ? 'Expense' : type === 'investment' ? 'Investment' : 'Savings'}
                     </button>
                     <button
                         onClick={() => navigate("/")}
@@ -206,6 +217,3 @@ export function AddExpense() {
         </div>
     );
 }
-
-
-

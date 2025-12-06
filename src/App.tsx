@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { AppShell } from "./components/layout/AppShell";
 import Dashboard from "./pages/Dashboard";
-import { AddExpense } from "./pages/AddExpense";
+import AddExpense from "./pages/AddExpense";
 import Budget from "./pages/Budget";
 import { Investments } from "./pages/Investments";
 import { Wrapped } from "./pages/Wrapped";

@@ -1,11 +1,28 @@
 import { Header } from "../components/layout/Header";
 import { useNotifications } from "../hooks/useNotifications";
 import { useExpenseStore, type Currency } from "../store/useExpenseStore";
-import { Moon, Sun, Monitor, DollarSign, Euro, PoundSterling, JapaneseYen, IndianRupee } from "lucide-react";
+import { Moon, Sun, Monitor, DollarSign, Euro, PoundSterling, JapaneseYen, IndianRupee, TrendingUp } from "lucide-react";
 import { cn } from "../lib/utils";
 
 export default function Settings() {
-    const { theme, setTheme, notifications, toggleNotifications, currency, setCurrency } = useExpenseStore();
+    const {
+        theme,
+        setTheme,
+        notifications,
+        toggleNotifications,
+        currency,
+        setCurrency,
+        income,
+        setIncome,
+        savingsGoal,
+        setSavingsGoal,
+        totalSavings,
+        investmentGoal,
+        setInvestmentGoal,
+        monthlyBudget,
+        setMonthlyBudget,
+    } = useExpenseStore();
+
     const { scheduleDailyReminder, cancelReminders } = useNotifications();
 
 
@@ -41,6 +58,100 @@ export default function Settings() {
         <div className="animate-fade-in pb-24">
             <Header title="Settings" large />
             <div className="p-4 space-y-8">
+                {/* Savings & Income Section */}
+                <div className="space-y-4">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <TrendingUp className="text-emerald-500" />
+                        Financial Goals
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Monthly Income (Total Inflow)
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                    {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
+                                </span>
+                                <input
+                                    type="number"
+                                    value={income || ''}
+                                    onChange={(e) => setIncome(Number(e.target.value))}
+                                    className="w-full pl-8 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                                    placeholder="0"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Allocations */}
+                        <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Monthly Budget (Needs)
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                    {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
+                                </span>
+                                <input
+                                    type="number"
+                                    value={monthlyBudget || ''}
+                                    onChange={(e) => setMonthlyBudget(Number(e.target.value))}
+                                    className="w-full pl-8 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                    placeholder="0"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Investment Allocation
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                    {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
+                                </span>
+                                <input
+                                    type="number"
+                                    value={investmentGoal || ''}
+                                    onChange={(e) => setInvestmentGoal(Number(e.target.value))}
+                                    className="w-full pl-8 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                                    placeholder="0"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Savings Goal (Resulting Target)
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                    {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
+                                </span>
+                                <input
+                                    type="number"
+                                    value={savingsGoal || ''}
+                                    onChange={(e) => setSavingsGoal(Number(e.target.value))}
+                                    className="w-full pl-8 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                                    placeholder="Calculated or Manual Goal"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">
+                                    Suggested: {currency === 'INR' ? '₹' : '$'}{Math.max(0, (income || 0) - (monthlyBudget || 0) - (investmentGoal || 0)).toLocaleString()}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 flex justify-between items-center">
+                        <div>
+                            <span className="text-sm text-emerald-800 dark:text-emerald-300 font-medium">Current Total Savings</span>
+                            <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-400">
+                                {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
+                                {totalSavings.toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Appearance */}
                 <div className="card-gradient rounded-2xl p-6 shadow-ios">
                     <h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-white">Appearance</h3>

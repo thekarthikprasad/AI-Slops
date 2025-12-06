@@ -9,7 +9,7 @@ import { Trash2, Plus } from "lucide-react";
 const categories: Category[] = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Investment', 'Misc'];
 
 export default function Budget() {
-    const { getBudgetProgress, budgets, createBudget, updateBudget, deleteBudget, getCurrencySymbol } = useExpenseStore();
+    const { getBudgetProgress, budgets, createBudget, updateBudget, deleteBudget, getCurrencySymbol, monthlyBudget } = useExpenseStore();
     const currencySymbol = getCurrencySymbol();
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [newBudgetName, setNewBudgetName] = useState("");
@@ -23,6 +23,14 @@ export default function Budget() {
                 alert("Please enter a valid amount");
                 return;
             }
+
+            // Check if within monthly allocation limit
+            const currentTotalAllocated = budgets.reduce((sum, b) => sum + b.amount, 0);
+            if (currentTotalAllocated + amount > monthlyBudget) {
+                alert(`Cannot create budget. You only have ${currencySymbol}${(monthlyBudget - currentTotalAllocated).toLocaleString()} remaining in your monthly allocation.`);
+                return;
+            }
+
             createBudget(newBudgetName, newBudgetCategory, amount);
             setNewBudgetName("");
             setNewBudgetAmount("");
@@ -79,7 +87,7 @@ export default function Budget() {
                             </select>
                             <input
                                 type="number"
-                                placeholder="Amount"
+                                placeholder={`Amount (Available: ${currencySymbol}${(monthlyBudget - budgets.reduce((sum, b) => sum + b.amount, 0)).toLocaleString()})`}
                                 value={newBudgetAmount}
                                 onChange={(e) => setNewBudgetAmount(e.target.value)}
                                 className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
