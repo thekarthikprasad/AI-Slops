@@ -15,10 +15,13 @@ Its clean, rich UI and smart features make managing your finances simple, intuit
       <td><img src="https://github.com/user-attachments/assets/46c596db-7b5e-44c0-9e87-7fe5815ebd1d" width="300" /></td>
       <td><img src="https://github.com/user-attachments/assets/a567c916-028e-4675-b5d3-7964996c20b9" width="300" /></td>
     </tr>
+    <tr>
+      <td colspan="2" align="center">
+        <img src="https://github.com/user-attachments/assets/66d59bad-706f-4876-bad0-7dc26f08b84c" width="300" />
+      </td>
+    </tr>
   </table>
 </div>
-
-
 
 ## Meet Xpense!
 
