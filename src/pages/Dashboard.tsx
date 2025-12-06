@@ -651,15 +651,21 @@ export default function Dashboard() {
                                                 return (
                                                     <>
                                                         {sortedSubItems.slice(0, 4).map((item, idx) => (
-                                                            <div key={item.id || idx} className="flex items-center gap-2 py-1">
-                                                                <span className="text-gray-400 dark:text-gray-500">—</span>
-                                                                <div className="flex-1 flex justify-between items-center text-xs">
+                                                            <div key={item.id || idx} className="py-1.5 pl-2">
+                                                                <div className="flex justify-between items-center text-xs mb-1">
                                                                     <span className="text-gray-600 dark:text-gray-300 font-medium truncate pr-2">
                                                                         {item.name}
                                                                     </span>
                                                                     <span className="text-gray-500 dark:text-gray-400 tabular-nums whitespace-nowrap">
                                                                         {currencySymbol}{item.total.toLocaleString()}
                                                                     </span>
+                                                                </div>
+                                                                <div className="h-1.5 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
+                                                                    <motion.div
+                                                                        initial={{ width: 0 }}
+                                                                        animate={{ width: `${(item.total / data.total) * 100}%` }}
+                                                                        className="h-full bg-purple-500 dark:bg-purple-400 rounded-full"
+                                                                    />
                                                                 </div>
                                                             </div>
                                                         ))}
