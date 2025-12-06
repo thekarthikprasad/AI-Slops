@@ -1,5 +1,5 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
-import { LayoutDashboard, PlusCircle, PieChart, Wallet, Calendar } from "lucide-react";
+import { LayoutDashboard, PlusCircle, PieChart, Calendar } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
@@ -18,7 +18,6 @@ export function AppShell() {
         { name: "Budget", icon: PieChart, path: "/budget" },
         { name: "Add", icon: PlusCircle, path: "/add", special: true },
         { name: "Calendar", icon: Calendar, path: "/calendar" },
-        { name: "Invest", icon: Wallet, path: "/invest" },
     ];
 
     return (
@@ -30,7 +29,7 @@ export function AppShell() {
                 <Outlet />
             </main>
 
-            <nav className="fixed bottom-0 left-0 right-0 pb-safe pt-2 z-50 bg-white/80 dark:bg-[#1C1C1E]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10">
+            <nav className="fixed bottom-0 left-0 right-0 pb-safe pt-3 z-50 bg-white/80 dark:bg-[#1C1C1E]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10">
                 <div className="max-w-md mx-auto flex justify-around items-center px-2">
                     {tabs.map((tab) => {
                         const isActive = location.pathname === tab.path;

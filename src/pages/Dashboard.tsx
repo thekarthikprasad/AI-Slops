@@ -7,27 +7,16 @@ import { Sparkles, TrendingUp, TrendingDown, Trash2 } from "lucide-react";
 import { cn } from "../lib/utils";
 
 export default function Dashboard() {
-    const { expenses, getTotalBudget, getOverallBudgetStatus, addExpense, deleteExpense } = useExpenseStore();
+    const { expenses, getTotalBudget, getOverallBudgetStatus, deleteExpense } = useExpenseStore();
 
     // Calculate total spent and balance reactively
     const totalSpent = expenses.reduce((acc, e) => acc + e.amount, 0);
-    const balance = 12450 - totalSpent; // Using the same mock starting balance as in store
-
     const totalBudget = getTotalBudget();
+    const balance = totalBudget - totalSpent; // Balance is remaining budget
+
     const budgetStatus = getOverallBudgetStatus();
     const budgetPercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
     const commentary = generateCommentary(expenses, balance);
-
-    const handleSync = () => {
-        const mockExpense = {
-            amount: 12.50,
-            category: 'Food' as const,
-            date: new Date().toISOString(),
-            note: 'Starbucks (GPay)'
-        };
-        addExpense(mockExpense);
-        alert("Synced 1 new transaction from GPay!");
-    };
 
     // Calculate spending by category for visualization
     const categorySpending = expenses.reduce((acc, expense) => {
@@ -58,18 +47,11 @@ export default function Dashboard() {
             : <TrendingUp className="text-gray-900" size={24} />;
     };
 
-
-
     return (
         <div className="animate-fade-in pb-24">
             <Header
                 title="Summary"
                 large
-                rightAction={
-                    <button onClick={handleSync} className="text-gray-900 ">
-                        Sync GPay
-                    </button>
-                }
             />
             <div className="p-4 space-y-6">
                 {/* Balance Card with Color Coding */}
@@ -83,7 +65,7 @@ export default function Dashboard() {
                 >
                     <div className="flex justify-between items-start mb-4">
                         <div>
-                            <span className="text-gray-900/80 ">Total Balance</span>
+                            <span className="text-gray-900/80 ">Remaining Budget</span>
                             <div className="text-4xl font-bold mt-1 tracking-tight text-gray-900 dark:text-gray-900 ">
                                 ₹{balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                             </div>

@@ -106,8 +106,8 @@ export const useExpenseStore = create<ExpenseStore>()(
                 return get().expenses.filter(e => e.date.startsWith(dateStr));
             },
             getTotalBalance: () => {
-                // Mock starting balance - total expenses
-                return 12450 - get().expenses.reduce((acc, curr) => acc + curr.amount, 0);
+                // Return 0 as we calculate balance dynamically based on budget or income
+                return 0;
             }
         }),
         {
