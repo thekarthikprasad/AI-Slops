@@ -136,6 +136,12 @@ export function AddExpense() {
                 >
                     Save Expense
                 </button>
+                <button
+                    onClick={() => navigate("/")}
+                    className="w-full bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white py-4 rounded-2xl shadow-lg font-bold text-lg active:scale-95 transition-transform flex items-center justify-center gap-2"
+                >
+                    Cancel
+                </button>
             </div>
         </div>
     );
