@@ -44,34 +44,42 @@ export default function Budget() {
                         animate={{ opacity: 1, height: "auto" }}
                         className="card-gradient p-4 rounded-2xl shadow-ios space-y-3"
                     >
-                        <input
-                            type="text"
-                            placeholder="Budget Name (e.g., Weekly Groceries)"
-                            value={newBudgetName}
-                            onChange={(e) => setNewBudgetName(e.target.value)}
-                            className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                        <select
-                            value={newBudgetCategory}
-                            onChange={(e) => setNewBudgetCategory(e.target.value as Category)}
-                            className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleCreateBudget();
+                            }}
+                            className="space-y-3"
                         >
-                            {categories.map((cat) => (
-                                <option key={cat} value={cat}>
-                                    {cat}
-                                </option>
-                            ))}
-                        </select>
-                        <input
-                            type="number"
-                            placeholder="Amount"
-                            value={newBudgetAmount}
-                            onChange={(e) => setNewBudgetAmount(e.target.value)}
-                            className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                        <button onClick={handleCreateBudget} className="w-full bg-gradient-primary text-white ">
-                            Add Budget
-                        </button>
+                            <input
+                                type="text"
+                                placeholder="Budget Name (e.g., Weekly Groceries)"
+                                value={newBudgetName}
+                                onChange={(e) => setNewBudgetName(e.target.value)}
+                                className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                            <select
+                                value={newBudgetCategory}
+                                onChange={(e) => setNewBudgetCategory(e.target.value as Category)}
+                                className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            >
+                                {categories.map((cat) => (
+                                    <option key={cat} value={cat}>
+                                        {cat}
+                                    </option>
+                                ))}
+                            </select>
+                            <input
+                                type="number"
+                                placeholder="Amount"
+                                value={newBudgetAmount}
+                                onChange={(e) => setNewBudgetAmount(e.target.value)}
+                                className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                            <button type="submit" className="w-full bg-gradient-primary text-white py-2 rounded-xl font-semibold">
+                                Add Budget
+                            </button>
+                        </form>
                     </motion.div>
                 )}
 

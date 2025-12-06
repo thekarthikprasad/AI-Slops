@@ -3,12 +3,16 @@ import { motion } from "framer-motion";
 import { useExpenseStore } from "../store/useExpenseStore";
 import { CategoryIcon } from "../components/ui/CategoryIcon";
 import { generateCommentary } from "../lib/aiLogic";
-import { Sparkles, TrendingUp, TrendingDown } from "lucide-react";
+import { Sparkles, TrendingUp, TrendingDown, Trash2 } from "lucide-react";
 import { cn } from "../lib/utils";
 
 export default function Dashboard() {
-    const { expenses, getTotalBalance, getTotalBudget, getOverallBudgetStatus, addExpense } = useExpenseStore();
-    const balance = getTotalBalance();
+    const { expenses, getTotalBudget, getOverallBudgetStatus, addExpense, deleteExpense } = useExpenseStore();
+
+    // Calculate total spent and balance reactively
+    const totalSpent = expenses.reduce((acc, e) => acc + e.amount, 0);
+    const balance = 12450 - totalSpent; // Using the same mock starting balance as in store
+
     const totalBudget = getTotalBudget();
     const budgetStatus = getOverallBudgetStatus();
     const commentary = generateCommentary(expenses, balance);
@@ -180,8 +184,16 @@ export default function Dashboard() {
                                     )}
                                 </div>
                             </div>
-                            <div className="font-semibold text-gray-900 dark:text-white ">
-                                -₹{expense.amount.toFixed(2)}
+                            <div className="flex items-center gap-3">
+                                <div className="font-semibold text-gray-900 dark:text-white ">
+                                    -₹{expense.amount.toFixed(2)}
+                                </div>
+                                <button
+                                    onClick={() => deleteExpense(expense.id)}
+                                    className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
                             </div>
                         </motion.div>
                     ))}
