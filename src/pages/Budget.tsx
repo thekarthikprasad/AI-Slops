@@ -58,43 +58,79 @@ export default function Budget() {
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="card-gradient p-4 rounded-2xl shadow-ios space-y-3"
+                        className="card-gradient p-4 rounded-2xl shadow-ios space-y-4"
                     >
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 handleCreateBudget();
                             }}
-                            className="space-y-3"
+                            className="space-y-4"
                         >
                             <input
                                 type="text"
                                 placeholder="Budget Name (e.g., Weekly Groceries)"
                                 value={newBudgetName}
                                 onChange={(e) => setNewBudgetName(e.target.value)}
-                                className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-gray-200 dark:border-gray-700"
                             />
-                            <select
-                                value={newBudgetCategory}
-                                onChange={(e) => setNewBudgetCategory(e.target.value as Category)}
-                                className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            >
-                                {categories.map((cat) => (
-                                    <option key={cat} value={cat}>
-                                        {cat}
-                                    </option>
-                                ))}
-                            </select>
+
+                            {/* Custom Category Selector */}
+                            <div className="space-y-2">
+                                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {categories.map((cat) => (
+                                        <button
+                                            key={cat}
+                                            type="button"
+                                            onClick={() => setNewBudgetCategory(cat)}
+                                            className={cn(
+                                                "flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all",
+                                                newBudgetCategory === cat
+                                                    ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
+                                                    : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-white/5 hover:border-gray-300 dark:hover:border-gray-600"
+                                            )}
+                                        >
+                                            <CategoryIcon category={cat} size="sm" />
+                                            <span className={cn(
+                                                "text-[10px] font-medium truncate w-full text-center",
+                                                newBudgetCategory === cat
+                                                    ? "text-purple-600 dark:text-purple-400"
+                                                    : "text-gray-600 dark:text-gray-400"
+                                            )}>{cat}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
                             <input
                                 type="number"
                                 placeholder={`Amount (Available: ${currencySymbol}${(monthlyBudget - budgets.reduce((sum, b) => sum + b.amount, 0)).toLocaleString()})`}
                                 value={newBudgetAmount}
                                 onChange={(e) => setNewBudgetAmount(e.target.value)}
-                                className="w-full px-4 py-2 rounded-xl bg-ios-gray6 dark:bg-ios-gray5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 border border-gray-200 dark:border-gray-700"
                             />
-                            <button type="submit" className="w-full bg-gradient-primary text-white py-2 rounded-xl font-semibold">
-                                Add Budget
-                            </button>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowCreateForm(false);
+                                        setNewBudgetName("");
+                                        setNewBudgetAmount("");
+                                    }}
+                                    className="flex-1 py-3 rounded-xl font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 bg-gradient-primary text-white py-3 rounded-xl font-semibold shadow-lg"
+                                >
+                                    Add Budget
+                                </button>
+                            </div>
                         </form>
                     </motion.div>
                 )}
