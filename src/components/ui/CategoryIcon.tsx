@@ -13,7 +13,7 @@ const categoryConfig: Record<Category, { icon: any, color: string, bg: string }>
     Misc: { icon: MoreHorizontal, color: "text-ios-gray", bg: "bg-ios-gray/10" },
 };
 
-export function CategoryIcon({ category, size = "md" }: { category: Category, size?: "sm" | "md" | "lg" }) {
+export function CategoryIcon({ category, size = "md", className }: { category: Category, size?: "sm" | "md" | "lg", className?: string }) {
     const config = categoryConfig[category] || categoryConfig.Misc;
     const Icon = config.icon;
 
@@ -24,7 +24,7 @@ export function CategoryIcon({ category, size = "md" }: { category: Category, si
     };
 
     return (
-        <div className={cn("rounded-full flex items-center justify-center", config.bg, config.color, sizeClasses[size])}>
+        <div className={cn("rounded-full flex items-center justify-center", config.bg, config.color, sizeClasses[size], className)}>
             <Icon size={size === "sm" ? 16 : size === "md" ? 20 : 24} />
         </div>
     );
