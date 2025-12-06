@@ -8,7 +8,8 @@ import { cn } from "../lib/utils";
 import { useState } from "react";
 
 export default function Dashboard() {
-    const { expenses, getTotalBudget, getOverallBudgetStatus, deleteExpense } = useExpenseStore();
+    const { expenses, getTotalBudget, getOverallBudgetStatus, deleteExpense, getCurrencySymbol } = useExpenseStore();
+    const currencySymbol = getCurrencySymbol();
 
     // Calculate total spent and balance reactively
     const totalSpent = expenses.reduce((acc, e) => acc + e.amount, 0);
@@ -87,7 +88,31 @@ export default function Dashboard() {
     }, {} as Record<string, number>);
 
     const topCategories = Object.entries(categorySpending)
-        .map(([category, amount]) => ({ category, amount }))
+        .map(([category, amount]) => {
+            const categoryExpenses = expenses.filter(e => e.category === category);
+
+            // Group by normalized name
+            const granularSpending = categoryExpenses.reduce((acc, e) => {
+                // Normalize: "  tea  " -> "Tea", "TEA" -> "Tea"
+                const rawName = e.name && e.name.trim() ? e.name.trim() : category;
+                const normalized = rawName.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+
+                acc[normalized] = (acc[normalized] || 0) + e.amount;
+                return acc;
+            }, {} as Record<string, number>);
+
+            // Get top 3 granular items
+            const topItems = Object.entries(granularSpending)
+                .map(([name, itemAmount]) => ({ name, amount: itemAmount }))
+                .sort((a, b) => b.amount - a.amount)
+                .slice(0, 3);
+
+            return {
+                category,
+                amount,
+                topItems
+            };
+        })
         .sort((a, b) => b.amount - a.amount)
         .slice(0, 5);
 
@@ -131,7 +156,7 @@ export default function Dashboard() {
                             <div>
                                 <span className="text-gray-900/80 font-medium">Remaining Budget</span>
                                 <div className="text-4xl font-bold mt-1 tracking-tight text-gray-900 dark:text-gray-900 ">
-                                    ₹{balance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                    {currencySymbol}{balance.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                 </div>
                             </div>
                             {getBalanceIcon()}
@@ -152,7 +177,7 @@ export default function Dashboard() {
                                     />
                                 </div>
                                 <div className="text-xs mt-2 text-gray-900/80">
-                                    ₹{totalSpent.toFixed(0)} of ₹{totalBudget} total budget
+                                    {currencySymbol}{totalSpent.toFixed(0)} of {currencySymbol}{totalBudget} total budget
                                 </div>
                             </div>
                         )}
@@ -169,7 +194,7 @@ export default function Dashboard() {
                             <div className="flex flex-col">
                                 <span className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Total Spent</span>
                                 <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                                    ₹{totalSpent.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                    {currencySymbol}{totalSpent.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                 </span>
                             </div>
                         </motion.div>
@@ -183,7 +208,7 @@ export default function Dashboard() {
                             <div className="flex flex-col">
                                 <span className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Total Budget</span>
                                 <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                                    ₹{totalBudget.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                    {currencySymbol}{totalBudget.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                 </span>
                             </div>
                         </motion.div>
@@ -229,7 +254,7 @@ export default function Dashboard() {
                                     />
                                     {item.amount > 0 && (
                                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                            ₹{item.amount}
+                                            {currencySymbol}{item.amount}
                                         </div>
                                     )}
                                 </div>
@@ -257,15 +282,41 @@ export default function Dashboard() {
                                 return (
                                     <div key={item.category}>
                                         <div className="flex justify-between text-sm mb-1">
-                                            <span className="font-medium dark:text-gray-900">{item.category}</span><span className="text-ios-subtext">₹{item.amount.toFixed(2)}</span>
+                                            <span className="font-medium text-gray-900 dark:text-white">{item.category}</span>
+                                            <span className="text-ios-subtext">{currencySymbol}{item.amount.toFixed(2)}</span>
                                         </div>
-                                        <div className="h-2 bg-ios-gray6 dark:bg-ios-gray5 rounded-full overflow-hidden">
+                                        <div className="h-2 bg-ios-gray6 dark:bg-ios-gray5 rounded-full overflow-hidden mb-3">
                                             <motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${percentage}%` }}
                                                 transition={{ delay: 0.1 + index * 0.05, duration: 0.5 }}
                                                 className="h-full bg-gradient-to-r from-purple-500 to-violet-500 rounded-full"
                                             />
+                                        </div>
+
+                                        {/* Granular Subchart */}
+                                        <div className="pl-2 space-y-2 border-l-2 border-gray-100 dark:border-white/5 ml-1">
+                                            {item.topItems.map((sub, subIndex) => {
+                                                const subPercentage = (sub.amount / item.amount) * 100;
+                                                return (
+                                                    <div key={sub.name} className="relative">
+                                                        <div className="flex justify-between text-xs mb-1">
+                                                            <span className="text-gray-600 dark:text-gray-400 truncate pr-2 max-w-[150px]">{sub.name}</span>
+                                                            <span className="text-gray-500 dark:text-gray-500 tabular-nums">
+                                                                {currencySymbol}{sub.amount.toFixed(0)}
+                                                            </span>
+                                                        </div>
+                                                        <div className="h-1.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden w-full">
+                                                            <motion.div
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: `${subPercentage}%` }}
+                                                                transition={{ delay: 0.2 + (index * 0.1) + (subIndex * 0.05), duration: 0.4 }}
+                                                                className="h-full bg-purple-300 dark:bg-purple-500/50 rounded-full"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 );
@@ -313,7 +364,7 @@ export default function Dashboard() {
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="font-semibold text-gray-900 dark:text-white ">
-                                    -₹{expense.amount.toFixed(2)}
+                                    -{currencySymbol}{expense.amount.toFixed(2)}
                                 </div>
                                 <button
                                     onClick={() => deleteExpense(expense.id)}

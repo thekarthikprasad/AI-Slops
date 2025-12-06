@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type Category = 'Food' | 'Transport' | 'Shopping' | 'Entertainment' | 'Bills' | 'Health' | 'Investment' | 'Misc';
+export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP' | 'JPY';
 
 export interface Expense {
     id: string;
@@ -38,6 +39,9 @@ interface ExpenseStore {
     setTheme: (theme: 'light' | 'dark' | 'system') => void;
     notifications: boolean;
     toggleNotifications: () => void;
+    currency: Currency;
+    setCurrency: (currency: Currency) => void;
+    getCurrencySymbol: () => string;
 }
 
 export const useExpenseStore = create<ExpenseStore>()(
@@ -47,6 +51,19 @@ export const useExpenseStore = create<ExpenseStore>()(
             budgets: [],
             theme: 'system',
             notifications: false,
+            currency: 'INR',
+            setCurrency: (currency) => set({ currency }),
+            getCurrencySymbol: () => {
+                const currency = get().currency;
+                switch (currency) {
+                    case 'USD': return '$';
+                    case 'EUR': return '€';
+                    case 'GBP': return '£';
+                    case 'JPY': return '¥';
+                    case 'INR':
+                    default: return '₹';
+                }
+            },
             setTheme: (theme) => {
                 set({ theme });
                 const root = window.document.documentElement;

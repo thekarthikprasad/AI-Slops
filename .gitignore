@@ -30,3 +30,6 @@ android/.gradle/
 android/local.properties
 *.apk
 *.aab
+*.jks
+*.keystore
+key.properties

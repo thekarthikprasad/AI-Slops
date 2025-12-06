@@ -9,7 +9,8 @@ import { Trash2, Plus } from "lucide-react";
 const categories: Category[] = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Investment', 'Misc'];
 
 export default function Budget() {
-    const { getBudgetProgress, budgets, createBudget, updateBudget, deleteBudget } = useExpenseStore();
+    const { getBudgetProgress, budgets, createBudget, updateBudget, deleteBudget, getCurrencySymbol } = useExpenseStore();
+    const currencySymbol = getCurrencySymbol();
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [newBudgetName, setNewBudgetName] = useState("");
     const [newBudgetCategory, setNewBudgetCategory] = useState<Category>('Food');
@@ -112,7 +113,7 @@ export default function Budget() {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                        ₹{spent.toFixed(0)} / ₹{budget.amount}
+                                        {currencySymbol}{spent.toFixed(0)} / {currencySymbol}{budget.amount}
                                     </div>
                                     <button
                                         onClick={() => deleteBudget(budget.id)}

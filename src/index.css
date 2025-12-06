@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-ios-bg: var(--color-ios-bg);
   --color-ios-card: var(--color-ios-card);
