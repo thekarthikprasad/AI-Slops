@@ -25,4 +25,4 @@ Its clean, rich UI and smart features make managing your finances simple, intuit
 <p>⚫🟣🔵🟢</p>
 https://github.com/thekarthikprasad/AI-Slops/actions/runs/19988725343/artifacts/4785652747
 
-Made with Antigravity.
+<p>Made with Antigravity.</p>
