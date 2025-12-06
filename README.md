@@ -13,7 +13,7 @@ Its clean, rich UI and smart features make managing your finances simple, intuit
     </tr>
     <tr>
       <td><img src="https://github.com/user-attachments/assets/46c596db-7b5e-44c0-9e87-7fe5815ebd1d" width="300" /></td>
-      <td><img src="https://github.com/user-attachments/assets/a567c916-028e-4675-b5d3-7964996c20b9" width="300" /></td>
+      <td><img width="1084" height="2412" alt="Screenshot_20251206-233312" src="https://github.com/user-attachments/assets/b0b1c18c-b946-4526-8037-a43035159a04" /></td>
     </tr>
     <tr>
       <td colspan="2" align="center">
