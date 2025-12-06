@@ -1,5 +1,5 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
-import { LayoutDashboard, PlusCircle, PieChart, Calendar } from "lucide-react";
+import { LayoutDashboard, PlusCircle, PieChart, Calendar, Settings } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
@@ -18,6 +18,7 @@ export function AppShell() {
         { name: "Budget", icon: PieChart, path: "/budget" },
         { name: "Add", icon: PlusCircle, path: "/add", special: true },
         { name: "Calendar", icon: Calendar, path: "/calendar" },
+        { name: "Settings", icon: Settings, path: "/settings" },
     ];
 
     return (
@@ -30,14 +31,14 @@ export function AppShell() {
             </main>
 
             <nav className="fixed bottom-0 left-0 right-0 pb-safe pt-3 z-50 bg-white/80 dark:bg-[#1C1C1E]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-white/10">
-                <div className="max-w-md mx-auto flex justify-between items-end px-6 h-16 pb-2 relative">
+                <div className="max-w-md mx-auto grid grid-cols-5 items-end px-2 h-16 pb-2">
                     {tabs.map((tab) => {
                         const isActive = location.pathname === tab.path;
                         const Icon = tab.icon;
 
                         if (tab.special) {
                             return (
-                                <div key={tab.name} className="absolute left-1/2 -translate-x-1/2 -top-6">
+                                <div key={tab.name} className="flex justify-center relative -top-6">
                                     <Link to={tab.path}>
                                         <motion.div
                                             whileTap={{ scale: 0.85 }}
@@ -52,18 +53,17 @@ export function AppShell() {
                             );
                         }
 
-                        // Adjust spacing for items to be balanced around the center
                         return (
                             <Link
                                 key={tab.name}
                                 to={tab.path}
-                                className="flex justify-center w-16"
+                                className="flex justify-center"
                             >
                                 <motion.div
                                     whileTap={{ scale: 0.85, y: -2 }}
                                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
                                     className={cn(
-                                        "flex flex-col items-center gap-1 p-2 rounded-2xl transition-all duration-200",
+                                        "flex flex-col items-center gap-1 p-2 w-16 rounded-2xl transition-all duration-200",
                                         isActive
                                             ? "text-purple-600 dark:text-violet-400"
                                             : "text-gray-400 dark:text-gray-500"
