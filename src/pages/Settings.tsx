@@ -187,7 +187,7 @@ export default function Settings() {
                                 Savings Goal (Resulting Target)
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-[55%] text-gray-500 font-medium">
+                                <span className="absolute left-3 top-1/2 -translate-y-[60%] text-gray-500 font-medium">
                                     {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
                                 </span>
                                 <input
