@@ -1,5 +1,5 @@
 import { Link, useLocation, Outlet } from "react-router-dom";
-import { LayoutDashboard, PlusCircle, PieChart, Calendar, Settings } from "lucide-react";
+import { LayoutDashboard, Plus, PieChart, Calendar, Settings } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
@@ -16,7 +16,7 @@ export function AppShell() {
     const tabs = [
         { name: "Dashboard", icon: LayoutDashboard, path: "/" },
         { name: "Budget", icon: PieChart, path: "/budget" },
-        { name: "Add", icon: PlusCircle, path: "/add", special: true },
+        { name: "Add", icon: Plus, path: "/add", special: true },
         { name: "Calendar", icon: Calendar, path: "/calendar" },
         { name: "Settings", icon: Settings, path: "/settings" },
     ];
@@ -38,18 +38,18 @@ export function AppShell() {
 
                         if (tab.special) {
                             return (
-                                <div key={tab.name} className="flex justify-center relative -top-6">
-                                    <Link to={tab.path}>
-                                        <motion.div
-                                            whileTap={{ scale: 0.85 }}
-                                            whileHover={{ scale: 1.05 }}
-                                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                                            className="bg-premium-gradient p-4 rounded-full shadow-lg border-4 border-white dark:border-[#1C1C1E]"
-                                        >
-                                            <Icon size={28} className="text-white" />
-                                        </motion.div>
-                                    </Link>
-                                </div>
+                                <Link
+                                    key={tab.name}
+                                    to={tab.path}
+                                    className="flex justify-center"
+                                >
+                                    <motion.div
+                                        whileTap={{ scale: 0.9 }}
+                                        className="bg-blue-500/10 dark:bg-blue-500/20 p-2.5 rounded-xl text-blue-600 dark:text-blue-400"
+                                    >
+                                        <Icon size={24} strokeWidth={2.5} />
+                                    </motion.div>
+                                </Link>
                             );
                         }
 

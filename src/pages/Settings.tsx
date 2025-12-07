@@ -1,8 +1,12 @@
 import { Header } from "../components/layout/Header";
 import { useNotifications } from "../hooks/useNotifications";
 import { useExpenseStore, type Currency } from "../store/useExpenseStore";
-import { Moon, Sun, Monitor, DollarSign, Euro, PoundSterling, JapaneseYen, IndianRupee, TrendingUp } from "lucide-react";
+import {
+    Moon, Sun, Monitor, DollarSign, Euro, PoundSterling, JapaneseYen, IndianRupee, TrendingUp,
+    User, LogOut, LogIn
+} from "lucide-react";
 import { cn } from "../lib/utils";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function Settings() {
     const {
@@ -16,7 +20,6 @@ export default function Settings() {
         setIncome,
         savingsGoal,
         setSavingsGoal,
-        totalSavings,
         investmentGoal,
         setInvestmentGoal,
         monthlyBudget,
@@ -24,6 +27,7 @@ export default function Settings() {
     } = useExpenseStore();
 
     const { scheduleDailyReminder, cancelReminders } = useNotifications();
+    const { user, signIn, signOut, loading, error } = useAuthStore();
 
 
     const handleToggleNotifications = async () => {
@@ -58,6 +62,64 @@ export default function Settings() {
         <div className="animate-fade-in pb-24">
             <Header title="Settings" large />
             <div className="p-4 space-y-8">
+                {/* Account / Cloud Sync Card */}
+                <div className="card-gradient rounded-2xl p-6 shadow-ios">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <User className="text-blue-500" />
+                        Account & Sync
+                    </h2>
+
+                    {user ? (
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                {user.photoURL ? (
+                                    <img src={user.photoURL} alt={user.displayName || "User"} className="w-12 h-12 rounded-full" />
+                                ) : (
+                                    <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                        <User size={24} className="text-blue-600 dark:text-blue-300" />
+                                    </div>
+                                )}
+                                <div>
+                                    <p className="font-medium text-gray-900 dark:text-white">{user.displayName}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => signOut()}
+                                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+                            >
+                                <LogOut size={20} />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Sign in to sync your expenses and budget across devices.
+                            </p>
+                            <button
+                                onClick={() => signIn()}
+                                disabled={loading}
+                                className="flex items-center justify-center gap-2 w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium active:scale-95 transition-all"
+                            >
+                                {loading ? (
+                                    <span>Loading...</span>
+                                ) : (
+                                    <>
+                                        <LogIn size={18} />
+                                        <span>Sign in with Google</span>
+                                    </>
+                                )}
+                            </button>
+                            {error && (
+                                <p className="text-xs text-red-500 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-100 dark:border-red-900/30">
+                                    {error}
+                                </p>
+                            )}
+                        </div>
+                    )}
+
+                </div>
+
                 {/* Savings & Income Section */}
                 <div className="space-y-4">
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -70,7 +132,7 @@ export default function Settings() {
                                 Monthly Income (Total Inflow)
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                <span className="absolute left-3 top-1/2 -translate-y-[55%] text-gray-500 font-medium">
                                     {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
                                 </span>
                                 <input
@@ -89,7 +151,7 @@ export default function Settings() {
                                 Monthly Budget (Needs)
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                <span className="absolute left-3 top-1/2 -translate-y-[55%] text-gray-500 font-medium">
                                     {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
                                 </span>
                                 <input
@@ -107,7 +169,7 @@ export default function Settings() {
                                 Investment Allocation
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                <span className="absolute left-3 top-1/2 -translate-y-[55%] text-gray-500 font-medium">
                                     {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
                                 </span>
                                 <input
@@ -125,7 +187,7 @@ export default function Settings() {
                                 Savings Goal (Resulting Target)
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                <span className="absolute left-3 top-1/2 -translate-y-[55%] text-gray-500 font-medium">
                                     {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
                                 </span>
                                 <input
@@ -141,15 +203,7 @@ export default function Settings() {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 flex justify-between items-center">
-                        <div>
-                            <span className="text-sm text-emerald-800 dark:text-emerald-300 font-medium">Current Total Savings</span>
-                            <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-400">
-                                {currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '¥'}
-                                {totalSavings.toLocaleString()}
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
 
                 {/* Appearance */}
@@ -270,6 +324,6 @@ export default function Settings() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

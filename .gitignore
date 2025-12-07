@@ -33,3 +33,10 @@ android/local.properties
 *.jks
 *.keystore
 key.properties
+
+# Secure & Agentic
+keystore.properties
+google-services.json
+.gemini/
+.agent/
+artifacts/
