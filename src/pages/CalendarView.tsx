@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Header } from "../components/layout/Header";
 import { useExpenseStore } from "../store/useExpenseStore";
 import { motion } from "framer-motion";
@@ -8,7 +8,7 @@ import { cn } from "../lib/utils";
 import { CategoryIcon } from "../components/ui/CategoryIcon";
 
 export default function CalendarView() {
-    const { expenses } = useExpenseStore();
+    const expenses = useExpenseStore(state => state.expenses);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -23,15 +23,27 @@ export default function CalendarView() {
     const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
 
+    // MEMOIZED Expense Groups for the month
+    const expensesByDay = useMemo(() => {
+        const groups: Record<string, typeof expenses> = {};
+        expenses.forEach(e => {
+            const dateStr = format(new Date(e.date), 'yyyy-MM-dd');
+            if (!groups[dateStr]) groups[dateStr] = [];
+            groups[dateStr].push(e);
+        });
+        return groups;
+    }, [expenses]);
+
     const getExpensesForDay = (date: Date) => {
-        return expenses.filter(e => isSameDay(new Date(e.date), date));
+        const dateStr = format(date, 'yyyy-MM-dd');
+        return expensesByDay[dateStr] || [];
     };
 
     const getTotalForDay = (date: Date) => {
         return getExpensesForDay(date).reduce((sum, e) => sum + e.amount, 0);
     };
 
-    const selectedDayExpenses = getExpensesForDay(selectedDate);
+    const selectedDayExpenses = useMemo(() => getExpensesForDay(selectedDate), [expensesByDay, selectedDate]);
 
     return (
         <div className="animate-fade-in pb-24">

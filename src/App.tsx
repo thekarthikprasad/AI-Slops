@@ -1,7 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
-import { LaunchScreen } from "./components/LaunchScreen";
+import { useEffect } from "react";
 import { useAuthStore } from "./store/useAuthStore";
 import { AppShell } from "./components/layout/AppShell";
 import Dashboard from "./pages/Dashboard";
@@ -14,12 +12,7 @@ import Settings from "./pages/Settings";
 import History from "./pages/History";
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
-
   useEffect(() => {
-    // Show splash for 2s to allow animation to complete
-    const timer = setTimeout(() => setShowSplash(false), 2000);
-
     // Initialize Auth Listener
     useAuthStore.getState().initialize();
 
@@ -33,16 +26,12 @@ function App() {
     });
 
     return () => {
-      clearTimeout(timer);
       unsubSync();
     };
   }, []);
 
   return (
     <>
-      <AnimatePresence>
-        {showSplash && <LaunchScreen key="launch-screen" />}
-      </AnimatePresence>
       <Routes>
         <Route path="/" element={<AppShell />}>
           <Route index element={<Dashboard />} />

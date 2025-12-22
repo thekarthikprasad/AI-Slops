@@ -9,22 +9,20 @@ import { cn } from "../lib/utils";
 import { useAuthStore } from "../store/useAuthStore";
 
 export default function Settings() {
-    const {
-        theme,
-        setTheme,
-        notifications,
-        toggleNotifications,
-        currency,
-        setCurrency,
-        income,
-        setIncome,
-        savingsGoal,
-        setSavingsGoal,
-        investmentGoal,
-        setInvestmentGoal,
-        monthlyBudget,
-        setMonthlyBudget,
-    } = useExpenseStore();
+    const theme = useExpenseStore(state => state.theme);
+    const setTheme = useExpenseStore(state => state.setTheme);
+    const notifications = useExpenseStore(state => state.notifications);
+    const toggleNotifications = useExpenseStore(state => state.toggleNotifications);
+    const currency = useExpenseStore(state => state.currency);
+    const setCurrency = useExpenseStore(state => state.setCurrency);
+    const income = useExpenseStore(state => state.income);
+    const setIncome = useExpenseStore(state => state.setIncome);
+    const savingsGoal = useExpenseStore(state => state.savingsGoal);
+    const setSavingsGoal = useExpenseStore(state => state.setSavingsGoal);
+    const investmentGoal = useExpenseStore(state => state.investmentGoal);
+    const setInvestmentGoal = useExpenseStore(state => state.setInvestmentGoal);
+    const monthlyBudget = useExpenseStore(state => state.monthlyBudget);
+    const setMonthlyBudget = useExpenseStore(state => state.setMonthlyBudget);
 
     const { scheduleDailyReminder, cancelReminders } = useNotifications();
     const { user, signIn, signOut, loading, error } = useAuthStore();

@@ -156,18 +156,40 @@
   }
 
   .animate-mesh {
-    /* Adaptive Mesh Gradient - Pleasing & Visible */
-    /* Light Mode: Soft, airy blend (Lavender, Pale Blue, Soft Pink) */
-    background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #ffdee9, #b5fffc);
-    background-size: 400% 400%;
-    animation: mesh 40s ease infinite;
+    /* Highly visible but smooth bubble mesh - pleasing ambient glow */
+    /* Light Mode: Intense but soft radial gradients */
+    background:
+      radial-gradient(circle at 20% 50%, rgba(224, 195, 252, 0.8) 0%, transparent 80%),
+      radial-gradient(circle at 80% 80%, rgba(142, 197, 252, 0.8) 0%, transparent 80%),
+      radial-gradient(circle at 40% 20%, rgba(255, 222, 233, 0.8) 0%, transparent 80%),
+      radial-gradient(circle at 60% 70%, rgba(181, 255, 252, 0.8) 0%, transparent 80%),
+      #ffffff;
+    background-size: 200% 200%;
+    animation: mesh 60s ease-in-out infinite;
+    filter: blur(75px);
+    /* Balanced for visibility and smoothness */
+    transform: scale(1.2) translate3d(0, 0, 0);
+    /* Push blurred edge artifacts outside the viewport and force GPU */
+    will-change: transform, filter;
+    transform-origin: center;
   }
 
   .dark .animate-mesh {
-    /* Dark Mode: Deep, rich, calming blend (Deep Blue, Purple, Night Sky) */
-    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #24243e, #302b63, #0f0c29);
-    background-size: 400% 400%;
-    animation: mesh 40s ease infinite;
+    /* Dark Mode: Vibrant deep bubble mesh with a strong glow */
+    background:
+      radial-gradient(circle at 20% 50%, rgba(32, 58, 67, 1) 0%, transparent 80%),
+      radial-gradient(circle at 80% 80%, rgba(48, 43, 99, 1) 0%, transparent 80%),
+      radial-gradient(circle at 40% 20%, rgba(44, 83, 100, 1) 0%, transparent 80%),
+      radial-gradient(circle at 60% 70%, rgba(36, 36, 62, 1) 0%, transparent 80%),
+      #0a0a0f;
+    /* Classic dark mode background */
+    background-size: 200% 200%;
+    animation: mesh 60s ease-in-out infinite;
+    filter: blur(75px);
+    /* Balanced for visibility and smoothness */
+    transform: scale(1.2) translate3d(0, 0, 0);
+    will-change: transform, filter;
+    transform-origin: center;
   }
 
   .bg-gradient-primary {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Header } from "../components/layout/Header";
 import { useExpenseStore } from "../store/useExpenseStore";
 import { motion } from "framer-motion";
@@ -7,32 +7,37 @@ import { Search } from "lucide-react";
 
 
 export default function History() {
-    const { expenses, getCurrencySymbol } = useExpenseStore();
+    const expenses = useExpenseStore(state => state.expenses);
+    const getCurrencySymbol = useExpenseStore(state => state.getCurrencySymbol);
     const currencySymbol = getCurrencySymbol();
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Sort transactions by date (newest first)
-    const sortedExpenses = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // MEMOIZED Expense Processing
+    const groupedExpenses = useMemo(() => {
+        // 1. Sort transactions by date (newest first)
+        const sorted = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    // Filter based on search
-    const filteredExpenses = sortedExpenses.filter(e =>
-    (e.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        e.category.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+        // 2. Filter based on search
+        const filtered = sorted.filter(e =>
+        (e.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            e.category.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
 
-    // Group by Date
-    const groupedExpenses: Record<string, typeof expenses> = {};
-    filteredExpenses.forEach(expense => {
-        const dateKey = new Date(expense.date).toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+        // 3. Group by Date
+        const grouped: Record<string, typeof expenses> = {};
+        filtered.forEach(expense => {
+            const dateKey = new Date(expense.date).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            if (!grouped[dateKey]) {
+                grouped[dateKey] = [];
+            }
+            grouped[dateKey].push(expense);
         });
-        if (!groupedExpenses[dateKey]) {
-            groupedExpenses[dateKey] = [];
-        }
-        groupedExpenses[dateKey].push(expense);
-    });
+        return grouped;
+    }, [expenses, searchTerm]);
 
     return (
         <div className="animate-fade-in pb-24">

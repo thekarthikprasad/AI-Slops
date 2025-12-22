@@ -1,5 +1,6 @@
 import { Header } from "../components/layout/Header";
 import { MonthlyReviewModal } from "../components/features/MonthlyReviewModal";
+import { SubcategoryModal } from "../components/features/SubcategoryModal";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useExpenseStore } from "../store/useExpenseStore";
@@ -7,20 +8,18 @@ import { CategoryIcon } from "../components/ui/CategoryIcon";
 import { generateCommentary } from "../lib/aiLogic";
 import { Sparkles, TrendingUp, TrendingDown, Trash2, Wallet, Eye, EyeOff } from "lucide-react";
 import { cn, normalizeText } from "../lib/utils";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 export default function Dashboard() {
-    const {
-        expenses,
-        deleteExpense,
-        getTotalBudget,
-        income,
-        getCurrencySymbol,
-        monthlyBudget,
-        investmentGoal,
-        savingsGoal,
-        totalSavings
-    } = useExpenseStore();
+    const expenses = useExpenseStore(state => state.expenses);
+    const deleteExpense = useExpenseStore(state => state.deleteExpense);
+    const getTotalBudget = useExpenseStore(state => state.getTotalBudget);
+    const income = useExpenseStore(state => state.income);
+    const getCurrencySymbol = useExpenseStore(state => state.getCurrencySymbol);
+    const monthlyBudget = useExpenseStore(state => state.monthlyBudget);
+    const investmentGoal = useExpenseStore(state => state.investmentGoal);
+    const savingsGoal = useExpenseStore(state => state.savingsGoal);
+    const totalSavings = useExpenseStore(state => state.totalSavings);
 
     const currencySymbol = getCurrencySymbol();
 
@@ -28,12 +27,14 @@ export default function Dashboard() {
     const [comparisonPeriod, setComparisonPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
     const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date; label: string } | null>(null);
     const [showSensitive, setShowSensitive] = useState(false); // Global Privacy State (Default: Blurred)
+    const [modalData, setModalData] = useState<{ category: string; expenses: any[]; total: number } | null>(null);
+    const [showAllCategories, setShowAllCategories] = useState(false);
 
     // 2. Core Variables
     const totalBudget = getTotalBudget(); // Monthly Budget (Operating)
 
-    // Dynamic filtering: Use selectedRange if set, otherwise current month
-    const getFilteredExpenses = () => {
+    // Dynamic filtering: Use selectedRange if set, otherwise current month - MEMOIZED
+    const currentMonthExpenses = useMemo(() => {
         if (selectedRange) {
             return expenses.filter(expense => {
                 const expenseDate = new Date(expense.date);
@@ -47,57 +48,63 @@ export default function Dashboard() {
             const expenseDate = new Date(expense.date);
             return expenseDate.getMonth() === now.getMonth() && expenseDate.getFullYear() === now.getFullYear();
         });
-    };
+    }, [expenses, selectedRange]);
 
-    const currentMonthExpenses = getFilteredExpenses();
+    // 3. Derived Display Values (Filtered by Type) - MEMOIZED
+    const displayTotalSpent = useMemo(() =>
+        currentMonthExpenses
+            .filter(e => e.type === 'expense' || (!e.type && !e.isFromSavings))
+            .reduce((sum, expense) => sum + expense.amount, 0)
+        , [currentMonthExpenses]);
 
-    // 3. Derived Display Values (Filtered by Type)
-    const displayTotalSpent = currentMonthExpenses
-        .filter(e => e.type === 'expense' || (!e.type && !e.isFromSavings))
-        .reduce((sum, expense) => sum + expense.amount, 0);
+    const displayInvested = useMemo(() =>
+        currentMonthExpenses
+            .filter(e => e.type === 'investment' || e.category === 'Investment')
+            .reduce((sum, e) => sum + e.amount, 0)
+        , [currentMonthExpenses]);
 
-    const displayInvested = currentMonthExpenses
-        .filter(e => e.type === 'investment' || e.category === 'Investment')
-        .reduce((sum, e) => sum + e.amount, 0);
+    // Savings Calculation: Explicit 'savings' type only - MEMOIZED
+    const displaySaved = useMemo(() =>
+        currentMonthExpenses
+            .filter(e => e.type === 'savings')
+            .reduce((sum, e) => sum + e.amount, 0)
+        , [currentMonthExpenses]);
 
-    // Savings Calculation: Explicit 'savings' type only
-    const displaySaved = currentMonthExpenses
-        .filter(e => e.type === 'savings')
-        .reduce((sum, e) => sum + e.amount, 0);
+    // TOTAL SAVINGS (All Time - Non Filtered) - MEMOIZED
+    const allTimeSavings = useMemo(() =>
+        totalSavings + expenses
+            .filter(e => e.type === 'savings')
+            .reduce((sum, e) => sum + e.amount, 0)
+        , [expenses, totalSavings]);
 
-    // TOTAL SAVINGS (All Time - Non Filtered)
-    // Sum of Store Total + All 'savings' transactions in history
-    const allTimeSavings = totalSavings + expenses
-        .filter(e => e.type === 'savings')
-        .reduce((sum, e) => sum + e.amount, 0);
-
-    // TOTAL INVESTMENTS (All Time - Non Filtered)
-    const allTimeInvestments = expenses
-        .filter(e => e.type === 'investment' || e.category === 'Investment')
-        .reduce((sum, e) => sum + e.amount, 0);
-
+    // TOTAL INVESTMENTS (All Time - Non Filtered) - MEMOIZED
+    const allTimeInvestments = useMemo(() =>
+        expenses
+            .filter(e => e.type === 'investment' || e.category === 'Investment')
+            .reduce((sum, e) => sum + e.amount, 0)
+        , [expenses]);
 
     // Net Savings (Cash Flow) = Savings Transactions + Remaining Operating Budget
     const budgetRemains = Math.max(0, monthlyBudget - displayTotalSpent);
     const displayNetSavings = displaySaved + budgetRemains;
 
-    // Commentary
-    const commentary = generateCommentary(currentMonthExpenses, totalBudget - displayTotalSpent);
-    // budgetStatus computed inline where needed
+    // Commentary - MEMOIZED
+    const commentary = useMemo(() =>
+        generateCommentary(currentMonthExpenses, totalBudget - displayTotalSpent)
+        , [currentMonthExpenses, totalBudget, displayTotalSpent]);
 
     // 4. Dynamic Pro-rating Logic for "Budget Insight"
-    const getDaysInRange = () => {
+    const rangeDays = useMemo(() => {
         if (selectedRange) {
             const diffTime = Math.abs(selectedRange.end.getTime() - selectedRange.start.getTime());
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
         }
         switch (comparisonPeriod) {
             case 'daily': return 1;
             case 'weekly': return 7;
             case 'monthly': return 30;
         }
-    };
-    const rangeDays = getDaysInRange();
+    }, [selectedRange, comparisonPeriod]);
 
 
 
@@ -107,8 +114,8 @@ export default function Dashboard() {
 
 
 
-    // 5. Comparison/Chart Data Generation
-    const getComparisonData = () => {
+    // 5. Comparison/Chart Data Generation - MEMOIZED
+    const comparisonData = useMemo(() => {
         const now = new Date();
         const data: { label: string; amount: number; start: Date; end: Date }[] = [];
 
@@ -185,9 +192,8 @@ export default function Dashboard() {
             }
         }
         return data;
-    };
+    }, [expenses, comparisonPeriod]);
 
-    const comparisonData = getComparisonData();
     const maxComparisonAmount = Math.max(...comparisonData.map(d => d.amount), 1);
 
     // Budget Efficiency is now calculated inline where needed
@@ -196,6 +202,13 @@ export default function Dashboard() {
     return (
         <div className="animate-fade-in pb-24">
             <MonthlyReviewModal />
+            <SubcategoryModal
+                isOpen={modalData !== null}
+                onClose={() => setModalData(null)}
+                category={modalData?.category || ''}
+                expenses={modalData?.expenses || []}
+                categoryTotal={modalData?.total || 0}
+            />
             <Header title="Summary" large />
             <div className="p-4 space-y-6">
 
@@ -540,7 +553,7 @@ export default function Dashboard() {
                                     <motion.div
                                         initial={{ height: 0 }}
                                         animate={{ height: `${(d.amount / maxComparisonAmount) * 100}%` }}
-                                        transition={{ delay: i * 0.1, duration: 0.5, ease: "easeOut" }}
+                                        transition={{ duration: 0.3, ease: "easeOut" }}
                                         className="absolute bottom-0 w-full bg-gradient-to-t from-emerald-500 to-teal-400 group-hover:from-emerald-400 group-hover:to-teal-300 transition-colors"
                                     />
                                     {/* Tooltip on hover/click could go here */}
@@ -626,12 +639,12 @@ export default function Dashboard() {
 
                         return (
                             <div className="space-y-6">
-                                {sortedGroups.map(([cat, data]) => (
-                                    <div key={cat} className="space-y-3">
+                                {sortedGroups.slice(0, showAllCategories ? sortedGroups.length : 3).map(([cat, data]) => (
+                                    <div key={cat} className="space-y-3 cursor-pointer group" onClick={() => setModalData({ category: cat, expenses: data.expenses, total: data.total })}>
                                         {/* Category Header */}
                                         <div className="flex justify-between items-end">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-gray-50 dark:bg-white/5 rounded-xl">
+                                                <div className="p-2 bg-gray-50 dark:bg-white/5 rounded-xl group-hover:bg-gray-100 dark:group-hover:bg-white/10 transition-colors">
                                                     <CategoryIcon category={cat as any} size="sm" />
                                                 </div>
                                                 <div>
@@ -662,7 +675,7 @@ export default function Dashboard() {
 
                                         {/* Sub-items (Expenses) - Grouped by Name */}
                                         {/* Sub-items (Expenses) - Grouped by Name - TREE STYLE */}
-                                        <div className="relative mt-3 pl-2">
+                                        <div className="relative mt-3 pl-2" onClick={(e) => e.stopPropagation()}>
                                             {/* Vertical Guide Line */}
                                             <div className="absolute left-[7px] top-0 bottom-4 w-[2px] bg-gray-100 dark:bg-gray-800 rounded-full" />
 
@@ -688,7 +701,7 @@ export default function Dashboard() {
 
                                                     return (
                                                         <>
-                                                            {sortedSubItems.slice(0, 4).map((item, idx) => (
+                                                            {sortedSubItems.slice(0, 2).map((item, idx) => (
                                                                 <div key={item.id || idx} className="relative pl-6">
 
 
@@ -710,12 +723,17 @@ export default function Dashboard() {
                                                                     </div>
                                                                 </div>
                                                             ))}
-                                                            {sortedSubItems.length > 4 && (
+                                                            {sortedSubItems.length > 2 && (
                                                                 <div className="relative pl-6 pt-1">
-
-                                                                    <div className="text-[10px] text-gray-400 font-medium">
-                                                                        + {sortedSubItems.length - 4} more
-                                                                    </div>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setModalData({ category: cat, expenses: data.expenses, total: data.total });
+                                                                        }}
+                                                                        className="text-xs text-blue-500 dark:text-blue-400 font-semibold hover:text-blue-600 dark:hover:text-blue-300 transition-colors bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-full"
+                                                                    >
+                                                                        + {sortedSubItems.length - 2} more
+                                                                    </button>
                                                                 </div>
                                                             )}
                                                         </>
@@ -725,6 +743,18 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                 ))}
+
+                                {/* Show More/Less Button */}
+                                {sortedGroups.length > 3 && (
+                                    <div className="flex justify-center pt-2">
+                                        <button
+                                            onClick={() => setShowAllCategories(!showAllCategories)}
+                                            className="text-sm text-blue-500 dark:text-blue-400 font-semibold hover:text-blue-600 dark:hover:text-blue-300 transition-colors bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-full"
+                                        >
+                                            {showAllCategories ? 'Show Less' : `Show ${sortedGroups.length - 3} More Categories`}
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         );
                     })()}
@@ -744,12 +774,12 @@ export default function Dashboard() {
                         </Link>
                     </div>
 
-                    {expenses.slice(0, 5).map((expense, i) => (
+                    {expenses.slice(0, 5).map((expense) => (
                         <motion.div
                             key={expense.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3 + i * 0.05 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.2 }}
                             className="card-gradient p-4 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer hover:shadow-md transition-all active:scale-[0.99]"
                         >
                             <div className="flex gap-3 items-center">

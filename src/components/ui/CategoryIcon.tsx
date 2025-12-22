@@ -1,6 +1,7 @@
 import type { Category } from "../../store/useExpenseStore";
 import { Utensils, Bus, ShoppingBag, Film, Receipt, HeartPulse, TrendingUp, MoreHorizontal } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { memo } from "react";
 
 const categoryConfig: Record<Category, { icon: any, color: string, bg: string }> = {
     Food: { icon: Utensils, color: "text-ios-orange", bg: "bg-ios-orange/10" },
@@ -13,7 +14,7 @@ const categoryConfig: Record<Category, { icon: any, color: string, bg: string }>
     Misc: { icon: MoreHorizontal, color: "text-ios-gray", bg: "bg-ios-gray/10" },
 };
 
-export function CategoryIcon({ category, size = "md", className }: { category: Category, size?: "sm" | "md" | "lg", className?: string }) {
+export const CategoryIcon = memo(function CategoryIcon({ category, size = "md", className }: { category: Category, size?: "sm" | "md" | "lg", className?: string }) {
     const config = categoryConfig[category] || categoryConfig.Misc;
     const Icon = config.icon;
 
@@ -28,4 +29,4 @@ export function CategoryIcon({ category, size = "md", className }: { category: C
             <Icon size={size === "sm" ? 16 : size === "md" ? 20 : 24} />
         </div>
     );
-}
+});

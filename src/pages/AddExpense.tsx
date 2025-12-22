@@ -10,7 +10,10 @@ import { CategoryIcon } from "../components/ui/CategoryIcon";
 
 export default function AddExpense() {
     const navigate = useNavigate();
-    const { addExpense, categories, expenses, getCurrencySymbol } = useExpenseStore();
+    const addExpense = useExpenseStore(state => state.addExpense);
+    const categories = useExpenseStore(state => state.categories);
+    const expenses = useExpenseStore(state => state.expenses);
+    const getCurrencySymbol = useExpenseStore(state => state.getCurrencySymbol);
     const currencySymbol = getCurrencySymbol();
 
     // State
@@ -19,6 +22,7 @@ export default function AddExpense() {
     const [selectedCategory, setSelectedCategory] = useState<Category>("Food");
     // New Type State: 'expense' | 'savings' | 'investment'
     const [type, setType] = useState<'expense' | 'savings' | 'investment'>('expense');
+    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]); // YYYY-MM-DD format
 
     // Suggestions logic
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -58,7 +62,7 @@ export default function AddExpense() {
             name: finalName,
             amount: parseFloat(amount),
             category: finalCategory,
-            date: new Date().toISOString(),
+            date: new Date(selectedDate).toISOString(),
             type: type // Pass the type
         });
 
@@ -148,6 +152,18 @@ export default function AddExpense() {
                                 </motion.div>
                             )}
                         </AnimatePresence>
+                    </div>
+
+                    {/* Date Picker */}
+                    <div className="mb-6 relative group">
+                        <label className="text-xs font-semibold text-gray-500 ml-4 mb-2 block uppercase tracking-wider">Date</label>
+                        <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            max={new Date().toISOString().split('T')[0]} // Prevent future dates
+                            className="w-full bg-white/60 dark:bg-[#1C1C1E]/60 p-4 rounded-2xl text-lg font-medium shadow-sm border border-white/20 dark:border-white/5 backdrop-blur-md focus:ring-2 focus:ring-blue-500/50 outline-none dark:text-white transition-all"
+                        />
                     </div>
 
                     {/* Category Grid (Only for Expense type) */}

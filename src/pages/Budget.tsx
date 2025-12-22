@@ -9,7 +9,13 @@ import { Trash2, Plus, ChevronDown, ChevronUp } from "lucide-react";
 const categories: Category[] = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Investment', 'Misc'];
 
 export default function Budget() {
-    const { getBudgetProgress, budgets, createBudget, deleteBudget, getCurrencySymbol, monthlyBudget, expenses } = useExpenseStore();
+    const getBudgetProgress = useExpenseStore(state => state.getBudgetProgress);
+    const budgets = useExpenseStore(state => state.budgets);
+    const createBudget = useExpenseStore(state => state.createBudget);
+    const deleteBudget = useExpenseStore(state => state.deleteBudget);
+    const getCurrencySymbol = useExpenseStore(state => state.getCurrencySymbol);
+    const monthlyBudget = useExpenseStore(state => state.monthlyBudget);
+    const expenses = useExpenseStore(state => state.expenses);
     const currencySymbol = getCurrencySymbol();
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [newBudgetName, setNewBudgetName] = useState("");
@@ -52,10 +58,10 @@ export default function Budget() {
                 {/* Create Budget Button */}
                 <button
                     onClick={() => setShowCreateForm(!showCreateForm)}
-                    className="w-full bg-premium-gradient text-white py-3 rounded-2xl shadow-lg flex items-center justify-center gap-2 font-semibold active:scale-95 transition-transform"
+                    className="w-full card-gradient py-4 rounded-2xl shadow-ios flex items-center justify-center gap-2 font-semibold active:scale-[0.98] transition-all hover:shadow-lg border-2 border-purple-500/20 dark:border-purple-400/20"
                 >
-                    <Plus size={20} />
-                    Create New Budget
+                    <Plus size={20} className="text-purple-600 dark:text-purple-400" />
+                    <span className="text-gray-900 dark:text-white">Create New Budget</span>
                 </button>
 
                 {/* Create Budget Form */}
