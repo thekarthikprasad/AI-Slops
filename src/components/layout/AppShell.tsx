@@ -4,6 +4,8 @@ import { cn } from "../../lib/utils";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useExpenseStore } from "../../store/useExpenseStore";
+import { haptics } from "../../lib/haptics";
+import { ImpactStyle } from "@capacitor/haptics";
 
 export function AppShell() {
     const location = useLocation();
@@ -41,6 +43,7 @@ export function AppShell() {
                                 <Link
                                     key={tab.name}
                                     to={tab.path}
+                                    onClick={() => haptics.impact(ImpactStyle.Light)}
                                     className="flex justify-center"
                                 >
                                     <motion.div
@@ -57,6 +60,7 @@ export function AppShell() {
                             <Link
                                 key={tab.name}
                                 to={tab.path}
+                                onClick={() => haptics.impact(ImpactStyle.Light)}
                                 className="flex justify-center"
                             >
                                 <motion.div

@@ -9,6 +9,8 @@ import { generateCommentary } from "../lib/aiLogic";
 import { Sparkles, TrendingUp, TrendingDown, Trash2, Wallet, Eye, EyeOff } from "lucide-react";
 import { cn, normalizeText } from "../lib/utils";
 import { useState, useMemo } from "react";
+import { haptics } from "../lib/haptics";
+import { ImpactStyle } from "@capacitor/haptics";
 
 export default function Dashboard() {
     const expenses = useExpenseStore(state => state.expenses);
@@ -220,7 +222,10 @@ export default function Dashboard() {
                                 {selectedRange ? selectedRange.label : `Current Month Overview`}
                             </h3>
                             <button
-                                onClick={() => setShowSensitive(!showSensitive)}
+                                onClick={() => {
+                                    setShowSensitive(!showSensitive);
+                                    haptics.impact(ImpactStyle.Medium);
+                                }}
                                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                             >
                                 {showSensitive ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -532,7 +537,10 @@ export default function Dashboard() {
                             {(['daily', 'weekly', 'monthly'] as const).map((p) => (
                                 <button
                                     key={p}
-                                    onClick={() => setComparisonPeriod(p)}
+                                    onClick={() => {
+                                        setComparisonPeriod(p);
+                                        haptics.impact(ImpactStyle.Light);
+                                    }}
                                     className={cn(
                                         "px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all",
                                         comparisonPeriod === p
@@ -729,6 +737,7 @@ export default function Dashboard() {
                                                                         onClick={(e) => {
                                                                             e.stopPropagation();
                                                                             setModalData({ category: cat, expenses: data.expenses, total: data.total });
+                                                                            haptics.impact(ImpactStyle.Light);
                                                                         }}
                                                                         className="text-xs text-blue-500 dark:text-blue-400 font-semibold hover:text-blue-600 dark:hover:text-blue-300 transition-colors bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-full"
                                                                     >
@@ -748,7 +757,10 @@ export default function Dashboard() {
                                 {sortedGroups.length > 3 && (
                                     <div className="flex justify-center pt-2">
                                         <button
-                                            onClick={() => setShowAllCategories(!showAllCategories)}
+                                            onClick={() => {
+                                                setShowAllCategories(!showAllCategories);
+                                                haptics.impact(ImpactStyle.Medium);
+                                            }}
                                             className="text-sm text-blue-500 dark:text-blue-400 font-semibold hover:text-blue-600 dark:hover:text-blue-300 transition-colors bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-full"
                                         >
                                             {showAllCategories ? 'Show Less' : `Show ${sortedGroups.length - 3} More Categories`}
@@ -794,7 +806,10 @@ export default function Dashboard() {
                                     -{currencySymbol}{expense.amount.toFixed(2)}
                                 </div>
                                 <button
-                                    onClick={() => deleteExpense(expense.id)}
+                                    onClick={() => {
+                                        deleteExpense(expense.id);
+                                        haptics.impact(ImpactStyle.Medium);
+                                    }}
                                     className="text-gray-400 hover:text-red-500 transition-colors p-1 opacity-0 group-hover:opacity-100"
                                 >
                                     <Trash2 size={16} />

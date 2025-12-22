@@ -7,6 +7,8 @@ import { Check, Delete } from "lucide-react";
 import { cn, normalizeText } from "../lib/utils";
 import type { Category } from "../store/useExpenseStore";
 import { CategoryIcon } from "../components/ui/CategoryIcon";
+import { haptics } from "../lib/haptics";
+import { ImpactStyle } from "@capacitor/haptics";
 
 export default function AddExpense() {
     const navigate = useNavigate();
@@ -31,17 +33,22 @@ export default function AddExpense() {
 
     // Numpad logic
     const handleNumPress = (num: string) => {
+        haptics.impact(ImpactStyle.Light);
         if (amount.includes('.') && num === '.') return;
         if (amount.length > 8) return;
         setAmount(prev => prev + num);
     };
 
     const handleDelete = () => {
+        haptics.impact(ImpactStyle.Medium);
         setAmount(prev => prev.slice(0, -1));
     };
 
     const handleSave = () => {
-        if (!amount) return;
+        if (!amount) {
+            haptics.error();
+            return;
+        }
 
         let finalName = normalizeText(name);
         let finalCategory = selectedCategory;
@@ -66,6 +73,7 @@ export default function AddExpense() {
             type: type // Pass the type
         });
 
+        haptics.success();
         navigate("/");
     };
 
@@ -78,9 +86,6 @@ export default function AddExpense() {
 
     return (
         <div className="min-h-screen relative overflow-hidden pb-24">
-            {/* Global Mesh Gradient Background */}
-            <div className="fixed inset-0 z-0 opacity-90 dark:opacity-70 pointer-events-none animate-mesh" />
-
             <div className="relative z-10">
                 <Header title="Add Transaction" showBack />
 
@@ -90,7 +95,10 @@ export default function AddExpense() {
                         {types.map((t) => (
                             <button
                                 key={t.id}
-                                onClick={() => setType(t.id)}
+                                onClick={() => {
+                                    setType(t.id);
+                                    haptics.impact(ImpactStyle.Medium);
+                                }}
                                 className={cn(
                                     "flex-1 py-3 rounded-xl text-sm font-semibold transition-all",
                                     type === t.id
@@ -137,9 +145,9 @@ export default function AddExpense() {
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                     className="absolute top-full left-0 right-0 mt-2 bg-white/90 dark:bg-[#2C2C2E]/90 backdrop-blur-xl rounded-2xl shadow-xl z-20 border border-gray-100 dark:border-white/5 overflow-hidden"
                                 >
-                                    {suggestions.map((suggestion, i) => (
+                                    {suggestions.map((suggestion) => (
                                         <button
-                                            key={i}
+                                            key={suggestion}
                                             onClick={() => {
                                                 setName(suggestion);
                                                 setShowSuggestions(false);
@@ -174,7 +182,10 @@ export default function AddExpense() {
                                 {categories.map((cat) => (
                                     <button
                                         key={cat}
-                                        onClick={() => setSelectedCategory(cat)}
+                                        onClick={() => {
+                                            setSelectedCategory(cat);
+                                            haptics.impact(ImpactStyle.Light);
+                                        }}
                                         className={cn(
                                             "flex flex-col items-center justify-center gap-2 p-3 rounded-2xl transition-all border",
                                             selectedCategory === cat

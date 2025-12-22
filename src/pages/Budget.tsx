@@ -5,6 +5,8 @@ import { useExpenseStore, type Category } from "../store/useExpenseStore";
 import { CategoryIcon } from "../components/ui/CategoryIcon";
 import { cn } from "../lib/utils";
 import { Trash2, Plus, ChevronDown, ChevronUp } from "lucide-react";
+import { haptics } from "../lib/haptics";
+import { ImpactStyle } from "@capacitor/haptics";
 
 const categories: Category[] = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Investment', 'Misc'];
 
@@ -27,6 +29,7 @@ export default function Budget() {
         if (newBudgetName && newBudgetAmount) {
             const amount = parseFloat(newBudgetAmount);
             if (isNaN(amount) || amount <= 0) {
+                haptics.error();
                 alert("Please enter a valid amount");
                 return;
             }
@@ -34,15 +37,18 @@ export default function Budget() {
             // Check if within monthly allocation limit
             const currentTotalAllocated = budgets.reduce((sum, b) => sum + b.amount, 0);
             if (currentTotalAllocated + amount > monthlyBudget) {
+                haptics.error();
                 alert(`Cannot create budget. You only have ${currencySymbol}${(monthlyBudget - currentTotalAllocated).toLocaleString()} remaining in your monthly allocation.`);
                 return;
             }
 
             createBudget(newBudgetName, newBudgetCategory, amount);
+            haptics.success();
             setNewBudgetName("");
             setNewBudgetAmount("");
             setShowCreateForm(false);
         } else {
+            haptics.warning();
             alert("Please fill in all fields");
         }
     };
@@ -57,7 +63,10 @@ export default function Budget() {
             <div className="p-4 space-y-6">
                 {/* Create Budget Button */}
                 <button
-                    onClick={() => setShowCreateForm(!showCreateForm)}
+                    onClick={() => {
+                        setShowCreateForm(!showCreateForm);
+                        haptics.impact(ImpactStyle.Medium);
+                    }}
                     className="w-full card-gradient py-4 rounded-2xl shadow-ios flex items-center justify-center gap-2 font-semibold active:scale-[0.98] transition-all hover:shadow-lg border-2 border-purple-500/20 dark:border-purple-400/20"
                 >
                     <Plus size={20} className="text-purple-600 dark:text-purple-400" />
@@ -94,7 +103,10 @@ export default function Budget() {
                                         <button
                                             key={cat}
                                             type="button"
-                                            onClick={() => setNewBudgetCategory(cat)}
+                                            onClick={() => {
+                                                setNewBudgetCategory(cat);
+                                                haptics.impact(ImpactStyle.Light);
+                                            }}
                                             className={cn(
                                                 "flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all",
                                                 newBudgetCategory === cat
@@ -130,6 +142,7 @@ export default function Budget() {
                                         setShowCreateForm(false);
                                         setNewBudgetName("");
                                         setNewBudgetAmount("");
+                                        haptics.impact(ImpactStyle.Medium);
                                     }}
                                     className="flex-1 py-3 rounded-xl font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
                                 >
@@ -137,6 +150,7 @@ export default function Budget() {
                                 </button>
                                 <button
                                     type="submit"
+                                    onClick={() => haptics.impact(ImpactStyle.Heavy)}
                                     className="flex-1 bg-gradient-primary text-white py-3 rounded-xl font-semibold shadow-lg"
                                 >
                                     Add Budget
@@ -166,7 +180,10 @@ export default function Budget() {
                             className="card-gradient rounded-2xl shadow-ios overflow-hidden"
                         >
                             <div
-                                onClick={() => toggleExpand(budget.id)}
+                                onClick={() => {
+                                    toggleExpand(budget.id);
+                                    haptics.impact(ImpactStyle.Light);
+                                }}
                                 className="p-4 cursor-pointer active:bg-gray-50 dark:active:bg-white/5 transition-colors"
                             >
                                 <div className="flex justify-between items-start mb-3">
@@ -226,7 +243,12 @@ export default function Budget() {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        if (confirm("Delete this budget?")) deleteBudget(budget.id);
+                                                        if (confirm("Delete this budget?")) {
+                                                            deleteBudget(budget.id);
+                                                            haptics.impact(ImpactStyle.Medium);
+                                                        } else {
+                                                            haptics.impact(ImpactStyle.Light);
+                                                        }
                                                     }}
                                                     className="text-red-500 flex items-center gap-1 hover:text-red-600"
                                                 >

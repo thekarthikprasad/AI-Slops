@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useAuthStore } from "../store/useAuthStore";
+import { haptics } from "../lib/haptics";
+import { ImpactStyle } from "@capacitor/haptics";
 
 export default function Settings() {
     const theme = useExpenseStore(state => state.theme);
@@ -83,7 +85,10 @@ export default function Settings() {
                                 </div>
                             </div>
                             <button
-                                onClick={() => signOut()}
+                                onClick={() => {
+                                    signOut();
+                                    haptics.impact(ImpactStyle.Medium);
+                                }}
                                 className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
                             >
                                 <LogOut size={20} />
@@ -95,7 +100,10 @@ export default function Settings() {
                                 Sign in to sync your expenses and budget across devices.
                             </p>
                             <button
-                                onClick={() => signIn()}
+                                onClick={() => {
+                                    signIn();
+                                    haptics.impact(ImpactStyle.Light);
+                                }}
                                 disabled={loading}
                                 className="flex items-center justify-center gap-2 w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-medium active:scale-95 transition-all"
                             >
@@ -214,7 +222,10 @@ export default function Settings() {
                             return (
                                 <button
                                     key={t.id}
-                                    onClick={() => setTheme(t.id)}
+                                    onClick={() => {
+                                        setTheme(t.id);
+                                        haptics.impact(ImpactStyle.Medium);
+                                    }}
                                     className={cn(
                                         "flex flex-col items-center gap-2 p-3 rounded-xl transition-all border-2",
                                         isActive
@@ -247,7 +258,10 @@ export default function Settings() {
                             return (
                                 <button
                                     key={c.id}
-                                    onClick={() => setCurrency(c.id as Currency)}
+                                    onClick={() => {
+                                        setCurrency(c.id as Currency);
+                                        haptics.impact(ImpactStyle.Light);
+                                    }}
                                     className={cn(
                                         "flex flex-col items-center gap-2 p-2 rounded-xl transition-all border-2",
                                         isActive
@@ -279,6 +293,9 @@ export default function Settings() {
                             onClick={() => {
                                 if (confirm('Are you sure you want to delete all expenses? This action cannot be undone.')) {
                                     useExpenseStore.getState().clearExpenses();
+                                    haptics.impact(ImpactStyle.Heavy);
+                                } else {
+                                    haptics.impact(ImpactStyle.Light);
                                 }
                             }}
                             className="w-full flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
@@ -294,7 +311,10 @@ export default function Settings() {
                     <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-white/5 rounded-xl">
                         <span className="text-gray-900 dark:text-white font-medium">Daily Reminders</span>
                         <div
-                            onClick={handleToggleNotifications}
+                            onClick={() => {
+                                handleToggleNotifications();
+                                haptics.impact(ImpactStyle.Medium);
+                            }}
                             className={cn(
                                 "w-11 h-6 rounded-full relative cursor-pointer transition-colors",
                                 notifications ? "bg-purple-500" : "bg-gray-300 dark:bg-gray-600"
