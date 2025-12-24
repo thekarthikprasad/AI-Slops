@@ -1,4 +1,4 @@
-# Xpense - Track your expenses 💸
+# Xpense - Track your expenses 
 
 Tracking your expenses is now effortless with **Xpense**!  
 Its clean, rich UI and smart features make managing your finances simple, intuitive, and stress-free.
