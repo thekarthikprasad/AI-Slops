@@ -52,5 +52,5 @@ v1.0.1
 ---
 
 <p>
-  Made with <strong>Antigravity</strong>.
+  Made with Antigravity.
 </p>
