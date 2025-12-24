@@ -51,6 +51,6 @@ v1.0.1
 - More dashboard metrics, to track your expenses with ease.
 ---
 
-<p align="center">
+<p>
   Made with <strong>Antigravity</strong>.
 </p>
